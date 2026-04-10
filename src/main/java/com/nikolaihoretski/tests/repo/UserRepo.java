@@ -13,8 +13,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = {
             "userRoles.role",
-            "userRoles.role.rolePermissions",
-            "userRoles.role.rolePermissions.permission"
+            "userPermissions.permission"
     })
     Optional<User> findByUsername(@NonNull String username);
 

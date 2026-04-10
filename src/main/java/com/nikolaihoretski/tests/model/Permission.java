@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "permissions")
@@ -27,8 +25,5 @@ public class Permission implements Serializable {
 
     @Column(nullable = false)
     private String description;
-
-    @OneToMany(mappedBy = "permission", fetch = FetchType.LAZY)
-    private Set<RolePermission> rolePermissions = new HashSet<>();
 
  }

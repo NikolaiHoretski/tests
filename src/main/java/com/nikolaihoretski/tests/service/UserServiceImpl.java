@@ -4,7 +4,6 @@ import com.nikolaihoretski.tests.dto.UserDto;
 import com.nikolaihoretski.tests.model.Permission;
 import com.nikolaihoretski.tests.model.Role;
 import com.nikolaihoretski.tests.model.User;
-import com.nikolaihoretski.tests.model.UserRole;
 import com.nikolaihoretski.tests.repo.PermissionRepo;
 import com.nikolaihoretski.tests.repo.RoleRepo;
 import com.nikolaihoretski.tests.repo.UserRepo;
@@ -43,14 +42,11 @@ public class UserServiceImpl implements UserService {
                             .map(userRole -> DEFAULT_PREFIX + userRole.getRole().getName())
                             .collect(Collectors.toSet());
 
-                    Set<String> permissions = user.getUserRoles().stream()
-                            .map(UserRole::getRole)
-                            .flatMap(role -> role.getRolePermissions().stream())
+                    Set<String> permissions = user.getUserPermissions().stream()
                             .map(p -> p.getPermission().getName())
                             .collect(Collectors.toSet());
 
                     return new UserDto(
-                            user.getId(),
                             user.getUsername(),
                             user.getPassword(),
                             user.getName(),
@@ -64,26 +60,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public boolean create(@NonNull UserDto dto) {
 
         if (userRepo.existsByUsername(dto.username())) {
             throw new RuntimeException("user already exists");
         }
 
-        final List<Role> currentRole = dto.roles() != null ? roleRepo.findAll() : List.of();
-        final List<Permission> currentPermissions = dto.permissions() != null ? permissionRepo.findAll() : List.of();
+        final Set<Role> currentRole = (dto.roles() != null) ? roleRepo.findAllByNameIn(dto.roles()) : Set.of();
+        final Set<Permission> currentPermissions = dto.permissions() != null ?
+                permissionRepo.findAllByNameIn(dto.permissions()) : Set.of();
 
         User user = new User();
         user.setUsername(dto.username());
         user.setPassword(dto.password());
         user.setName(dto.name());
         user.setEmail(dto.email());
-        user.setEnabled(dto.isEnabled());
+        user.setEnabled(true);
 
-        currentRole.forEach(role -> {
-            user.addRole(role);
-            currentPermissions.forEach(role::addPermission);
-        });
+        currentRole.forEach(user::addRole);
+        currentPermissions.forEach(user::addPermission);
 
         userRepo.save(user);
 

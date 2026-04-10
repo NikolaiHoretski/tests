@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "role_permissions", uniqueConstraints = {
+@Table(name = "user_permissions", uniqueConstraints = {
         @UniqueConstraint(name = "uk_role_permission", columnNames = {
-                "role_id", "permission_id"
+                "user_id", "permission_id"
         })})
-public class RolePermission implements Serializable {
+public class UserPermission implements Serializable {
 
     private static final Long serialVersionID = 1L;
 
@@ -47,11 +47,11 @@ public class RolePermission implements Serializable {
     private User updatedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", foreignKey = @ForeignKey(name = "fk_role"))
-    private Role role;
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user"))
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "permission_id", foreignKey = @ForeignKey(name = "fk_permission"))
+    @JoinColumn(name = "permission_id")
     private Permission permission;
 
 }

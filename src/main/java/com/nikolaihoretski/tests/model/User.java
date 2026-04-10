@@ -57,17 +57,30 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "updatedBy", fetch = FetchType.LAZY)
     private Set<UserRole> updateUserRole = new HashSet<>();
 
-    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    private Set<RolePermission> createRolePermissions = new HashSet<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserPermission> userPermissions = new HashSet<>();
 
-    @OneToMany(mappedBy = "updatedBy", fetch = FetchType.LAZY)
-    private Set<RolePermission> updateRolePermissions = new HashSet<>();
 
     public void addRole(Role role) {
-        UserRole userRole = new UserRole();
-        userRole.setRole(role);
-        userRole.setUser(this);
-        this.userRoles.add(userRole);
+        boolean alreadyHasRole = this.userRoles.stream()
+                .anyMatch(ur -> ur.getRole().equals(role));
+        if (!alreadyHasRole) {
+            UserRole userRole = new UserRole();
+            userRole.setRole(role);
+            userRole.setUser(this);
+            this.userRoles.add(userRole);
+        }
+    }
+
+    public void addPermission(Permission permission) {
+        boolean alreadyHasPermission = this.userPermissions.stream()
+                .anyMatch(up -> up.getPermission().equals(permission));
+        if (!alreadyHasPermission) {
+            UserPermission userPermission = new UserPermission();
+            userPermission.setPermission(permission);
+            userPermission.setUser(this);
+            this.userPermissions.add(userPermission);
+        }
     }
 
 }

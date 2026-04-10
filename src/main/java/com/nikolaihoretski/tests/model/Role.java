@@ -30,19 +30,4 @@ public class Role implements Serializable {
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private Set<UserRole> userRoles = new HashSet<>();
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<RolePermission> rolePermissions = new HashSet<>();
-
-    public void addPermission(Permission permission) {
-        boolean exists = this.rolePermissions.stream()
-                .anyMatch(rp -> rp.getPermission().getName().equals(permission.getName()));
-
-        if (!exists) {
-            RolePermission rolePermission = new RolePermission();
-            rolePermission.setPermission(permission);
-            rolePermission.setRole(this);
-            this.rolePermissions.add(rolePermission);
-        }
-    }
-
 }
