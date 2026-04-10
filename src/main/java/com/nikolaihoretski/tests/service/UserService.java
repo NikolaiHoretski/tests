@@ -6,4 +6,5 @@ public interface UserService {
 
     UserDto findByUsername(String username);
 
+    boolean create(UserDto userDto);
 }

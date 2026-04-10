@@ -1,11 +1,17 @@
 package com.nikolaihoretski.tests.service;
 
 import com.nikolaihoretski.tests.dto.UserDto;
+import com.nikolaihoretski.tests.model.Permission;
+import com.nikolaihoretski.tests.model.Role;
+import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.model.UserRole;
+import com.nikolaihoretski.tests.repo.PermissionRepo;
+import com.nikolaihoretski.tests.repo.RoleRepo;
 import com.nikolaihoretski.tests.repo.UserRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,10 +20,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
 
+    private final RoleRepo roleRepo;
+
+    private final PermissionRepo permissionRepo;
+
     private static final String DEFAULT_PREFIX = "ROLE_";
 
-    public UserServiceImpl(UserRepo userRepo) {
+    public UserServiceImpl(UserRepo userRepo, RoleRepo roleRepo, PermissionRepo permissionRepo) {
         this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
+        this.permissionRepo = permissionRepo;
     }
 
     @Override
@@ -48,6 +60,33 @@ public class UserServiceImpl implements UserService {
                     );
                 })
                 .orElseThrow(() -> new RuntimeException("user" + username + " not found"));
+    }
+
+    @Override
+    public boolean create(UserDto dto) {
+
+        if (userRepo.existsByUsername(dto.username())) {
+            throw new RuntimeException("user already exists");
+        }
+
+        final List<Role> currentRole = dto.roles() != null ? roleRepo.findAll() : List.of();
+        final List<Permission> currentPermissions = dto.permissions() != null ? permissionRepo.findAll() : List.of();
+
+        User user = new User();
+        user.setUsername(dto.username());
+        user.setPassword(dto.password());
+        user.setName(dto.name());
+        user.setEmail(dto.email());
+        user.setEnabled(dto.isEnabled());
+
+        currentRole.forEach(role -> {
+            user.addRole(role);
+            currentPermissions.forEach(role::addPermission);
+        });
+
+        userRepo.save(user);
+
+        return true;
     }
 
 }
