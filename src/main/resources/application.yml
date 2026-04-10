@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: study_for_testing
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+  liquibase:
+    change-log: classpath:/db/changelog/master.yml
+    analytics-enabled: true
+    enabled: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    root: INFO
+server:
+  address: 0.0.0.0
+  port: 8080

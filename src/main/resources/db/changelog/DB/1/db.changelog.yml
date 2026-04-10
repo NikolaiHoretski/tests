@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: task-1
+      author: Nikolai Horetski
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - or:
+                - tableExists:
+                    tableName: roles
+                - tableExists:
+                    tableName: users
+                - tableExists:
+                    tableName: permissions
+      comment: task-1
+      changes:
+        - sqlFile:
+            path: task-1.sql
+            relativeToChangelogFile: true
+            encoding: utf-8

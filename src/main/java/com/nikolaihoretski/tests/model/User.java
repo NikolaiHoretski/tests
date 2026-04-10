@@ -1,0 +1,73 @@
+package com.nikolaihoretski.tests.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EntityListeners(AuditingEntityListener.class)
+public class User implements Serializable {
+
+    private static final Long serialVersionID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String username;
+
+    @Column(nullable = false)
+    private String password;
+
+    private String name;
+
+    @Column(unique = true)
+    private String email;
+
+    @Column(name = "is_enabled", nullable = false)
+    private boolean isEnabled = true;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private Set<UserRole> userRoles = new HashSet<>();
+
+    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
+    private Set<UserRole> createUserRoles = new HashSet<>();
+
+    @OneToMany(mappedBy = "updatedBy", fetch = FetchType.LAZY)
+    private Set<UserRole> updateUserRole = new HashSet<>();
+
+    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
+    private Set<RolePermission> createRolePermissions = new HashSet<>();
+
+    @OneToMany(mappedBy = "updatedBy", fetch = FetchType.LAZY)
+    private Set<RolePermission> updateRolePermissions = new HashSet<>();
+
+    public void addRole(Role role) {
+        UserRole userRole = new UserRole();
+        userRole.setRole(role);
+        userRole.setUser(this);
+        this.userRoles.add(userRole);
+    }
+
+}

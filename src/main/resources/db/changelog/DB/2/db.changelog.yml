@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: task-2
+      author: Nikolai Horetski
+      preConditions:
+        - onFail: MARK_RAN
+      comment: task-2
+      changes:
+        - sqlFile:
+            path: task-2.sql
+            relativeToChangelogFile: true
+            encoding: utf-8
