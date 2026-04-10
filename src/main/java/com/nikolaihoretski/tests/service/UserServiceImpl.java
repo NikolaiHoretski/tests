@@ -8,6 +8,7 @@ import com.nikolaihoretski.tests.model.UserRole;
 import com.nikolaihoretski.tests.repo.PermissionRepo;
 import com.nikolaihoretski.tests.repo.RoleRepo;
 import com.nikolaihoretski.tests.repo.UserRepo;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto findByUsername(String username) {
+    public UserDto findByUsername(@NonNull String username) {
 
         return userRepo.findByUsername(username)
                 .map(user -> {
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean create(UserDto dto) {
+    public boolean create(@NonNull UserDto dto) {
 
         if (userRepo.existsByUsername(dto.username())) {
             throw new RuntimeException("user already exists");

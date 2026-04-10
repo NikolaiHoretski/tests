@@ -1,6 +1,7 @@
 package com.nikolaihoretski.tests.repo;
 
 import com.nikolaihoretski.tests.model.User;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,8 +16,8 @@ public interface UserRepo extends JpaRepository<User, Long> {
             "userRoles.role.rolePermissions",
             "userRoles.role.rolePermissions.permission"
     })
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsername(@NonNull String username);
 
-    boolean existsByUsername(String username);
+    boolean existsByUsername(@NonNull String username);
 
 }
