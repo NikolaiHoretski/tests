@@ -2,12 +2,13 @@ package com.nikolaihoretski.tests.dto;
 
 import java.util.Set;
 
-public record UserDto(
+public record CreateUserDto(
         String username,
-        String password,
         String name,
+        String password,
         String email,
-        Boolean isEnabled,
+        String isEnabled,
         Set<String> roles,
         Set<String> permissions
-) {}
+) {
+}

@@ -1,8 +1,6 @@
 package com.nikolaihoretski.tests.service;
 
-import com.nikolaihoretski.tests.dto.UserDto;
-import com.nikolaihoretski.tests.model.Permission;
-import com.nikolaihoretski.tests.model.Role;
+import com.nikolaihoretski.tests.dto.FindUserDto;
 import com.nikolaihoretski.tests.repo.PermissionRepo;
 import com.nikolaihoretski.tests.repo.RoleRepo;
 import org.junit.jupiter.api.Test;
@@ -14,9 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,7 +37,7 @@ class UserServiceImplIT {
 
        String username = "admin";
 
-        UserDto result = userService.findByUsername(username);
+        FindUserDto result = userService.findByUsername(username);
 
         assertNotNull(result);
         assertEquals("admin", result.username());

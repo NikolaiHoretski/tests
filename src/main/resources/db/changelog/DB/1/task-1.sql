@@ -21,7 +21,9 @@ create table users
     email      VARCHAR(255),
     is_enabled bool         NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    updated_by  VARCHAR(255)
 );
 
 create table user_roles

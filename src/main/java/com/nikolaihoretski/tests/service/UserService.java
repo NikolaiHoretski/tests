@@ -1,11 +1,16 @@
 package com.nikolaihoretski.tests.service;
 
-import com.nikolaihoretski.tests.dto.UserDto;
+import com.nikolaihoretski.tests.dto.CreateUserDto;
+import com.nikolaihoretski.tests.dto.FindUserDto;
 import lombok.NonNull;
 
 public interface UserService {
 
-    UserDto findByUsername(@NonNull String username);
+    @NonNull
+    FindUserDto findByUsername(@NonNull String username);
 
-    boolean create(@NonNull UserDto userDto);
+    @NonNull
+    FindUserDto findById(@NonNull Long id);
+
+    boolean create(@NonNull CreateUserDto userDto);
 }
