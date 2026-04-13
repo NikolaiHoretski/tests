@@ -3,7 +3,7 @@ package com.nikolaihoretski.tests.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,13 +14,10 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class Role implements Serializable {
+public class Role extends BaseEntity<User> {
 
-    private static final Long serialVersionID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Column(unique = true, nullable = false)
     private String name;

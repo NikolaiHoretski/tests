@@ -4,7 +4,7 @@ import lombok.NonNull;
 
 public class UserNotFoundException extends RuntimeException {
 
-    public UserNotFoundException(@NonNull String username) {
-    super("User with username " + username + " not found");
+    public UserNotFoundException(@NonNull Long id) {
+    super("User with id " + id + " not found");
     }
 }

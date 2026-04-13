@@ -2,12 +2,9 @@ package com.nikolaihoretski.tests.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,13 +15,10 @@ import java.util.Set;
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-public class User implements Serializable {
+public class User extends BaseEntity<User> {
 
-    private static final Long serialVersionID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -39,20 +33,6 @@ public class User implements Serializable {
 
     @Column(name = "is_enabled", nullable = false)
     private boolean isEnabled = true;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserRole> userRoles = new HashSet<>();

@@ -2,14 +2,22 @@ create table roles
 (
     id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        VARCHAR(255) NOT NULL UNIQUE,
-    description VARCHAR(300)
+    description VARCHAR(300),
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP,
+    created_by  BIGINT,
+    updated_by  BIGINT
 );
 
 create table permissions
 (
     id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        VARCHAR(255) NOT NULL UNIQUE,
-    description VARCHAR(300)
+    description VARCHAR(300),
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP,
+    created_by  BIGINT,
+    updated_by  BIGINT
 );
 
 create table users
@@ -21,16 +29,16 @@ create table users
     email      VARCHAR(255),
     is_enabled bool         NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(255),
-    updated_by  VARCHAR(255)
+    updated_at TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT
 );
 
 create table user_roles
 (
     id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
     created_by BIGINT,
     updated_by BIGINT,
     user_id    BIGINT NOT NULL,
@@ -46,7 +54,7 @@ create table user_permissions
 (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP,
     created_by    BIGINT,
     updated_by    BIGINT,
     user_id       BIGINT NOT NULL,

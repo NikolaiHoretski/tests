@@ -5,12 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.io.Serial;
 
 @Entity
 @NoArgsConstructor
@@ -22,29 +19,10 @@ import java.time.LocalDateTime;
         @UniqueConstraint(name = "uk_role_permission", columnNames = {
                 "user_id", "permission_id"
         })})
-public class UserPermission implements Serializable {
+public class UserPermission extends BaseEntity<User> {
 
-    private static final Long serialVersionID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @CreatedDate
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", foreignKey = @ForeignKey(name = "fk_create_by"))
-    private User createdBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by", foreignKey = @ForeignKey(name = "fk_update_by"))
-    private User updatedBy;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user"))

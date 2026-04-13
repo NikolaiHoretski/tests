@@ -3,6 +3,7 @@ package com.nikolaihoretski.tests.service;
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
+import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
 import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.PermissionRepo;
@@ -44,12 +45,12 @@ class UserServiceImplIT {
 
         final String username = "admin";
 
-        final UserResponseDto result = userService.findByUsername(username);
+        final UserResponseDto actualResult = userService.findByUsername(username);
 
-        assertNotNull(result);
-        assertEquals(username, result.username());
-        assertTrue(result.roles().contains("ROLE_ADMIN"));
-        assertTrue(result.permissions().contains("READ"));
+        assertNotNull(actualResult);
+        assertEquals(username, actualResult.username());
+        assertTrue(actualResult.roles().contains("ROLE_ADMIN"));
+        assertTrue(actualResult.permissions().contains("READ"));
     }
 
     @Test
@@ -57,17 +58,17 @@ class UserServiceImplIT {
 
         final Long userId = 1L;
 
-        final UserResponseDto result = userService.findById(userId);
+        final UserResponseDto actualResult = userService.findById(userId);
 
-        assertNotNull(result);
-        assertEquals(userId, result.id());
-        assertTrue(result.roles().contains("ROLE_USER"));
-        assertTrue(result.permissions().contains("READ"));
+        assertNotNull(actualResult);
+        assertEquals(userId, actualResult.id());
+        assertTrue(actualResult.roles().contains("ROLE_USER"));
+        assertTrue(actualResult.permissions().contains("READ"));
 
     }
 
     @Test
-    void create_shouldSaveUser_WhenRequestIsValid() {
+    void create_ForAdmin_shouldSaveUser_WhenRequestIsValid() {
 
         UserCreateRequestDto createRequestDto = new UserCreateRequestDto(
                 "my_user",
@@ -78,16 +79,16 @@ class UserServiceImplIT {
                 Set.of("WRITE")
         );
 
-        UserResponseWithIdUsernameDto result = userService.create(createRequestDto);
+        UserResponseWithIdUsernameDto actualResult = userService.createForAdmin(createRequestDto);
 
-        assertNotNull(result);
-        assertEquals(createRequestDto.username(), result.username());
+        assertNotNull(actualResult);
+        assertEquals(createRequestDto.username(), actualResult.username());
 
         assertTrue(userRepo.existsByUsername(createRequestDto.username()));
     }
 
     @Test
-    void create_shouldThrowException_WhenUserAlreadyExists() {
+    void create_ForAdmin_shouldThrowException_WhenUserAlreadyExists() {
 
         User existingUser = new User();
         existingUser.setUsername("admin123");
@@ -97,7 +98,7 @@ class UserServiceImplIT {
 
         userRepo.save(existingUser);
 
-        UserCreateRequestDto createRequestDto = new UserCreateRequestDto(
+        UserCreateRequestDto actualResult = new UserCreateRequestDto(
                 "admin123",
                 "admin",
                 "admin123",
@@ -106,7 +107,31 @@ class UserServiceImplIT {
                 Set.of("WRITE")
         );
 
-        assertThrows(UserAlreadyExistException.class, () -> userService.create(createRequestDto));
+        assertThrows(UserAlreadyExistException.class, () -> userService.createForAdmin(actualResult));
+    }
+
+    @Test
+    void update_shouldUpdateUser_WhenRequestIsValid() {
+
+        User existingUser = new User();
+        existingUser.setId(1L);
+        existingUser.setUsername("me");
+        existingUser.setPassword("me");
+        existingUser.setEmail("me@me.by");
+        existingUser.setName("me");
+
+        userRepo.save(existingUser);
+
+        UserUpdateRequestDto createRequestDto = new UserUpdateRequestDto(
+                1L,
+                "me",
+                "not_me",
+                null
+        );
+
+        UserResponseWithIdUsernameDto actualResult = userService.update(createRequestDto);
+
+        assertNotNull(actualResult);
     }
 
 }
