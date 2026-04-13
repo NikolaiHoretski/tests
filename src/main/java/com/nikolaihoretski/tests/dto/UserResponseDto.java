@@ -2,8 +2,8 @@ package com.nikolaihoretski.tests.dto;
 
 import java.util.Set;
 
-
-public record FindUserDto(
+public record UserResponseDto(
+        Long id,
         String username,
         String name,
         String email,

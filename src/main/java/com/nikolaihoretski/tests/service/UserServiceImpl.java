@@ -1,9 +1,9 @@
 package com.nikolaihoretski.tests.service;
 
-import com.nikolaihoretski.tests.dto.CreateUserDto;
-import com.nikolaihoretski.tests.dto.FindUserDto;
+import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
+import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
-import com.nikolaihoretski.tests.mapper.Mapper;
+import com.nikolaihoretski.tests.mapper.MapperUtils;
 import com.nikolaihoretski.tests.model.Permission;
 import com.nikolaihoretski.tests.model.Role;
 import com.nikolaihoretski.tests.model.User;
@@ -33,24 +33,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public @NonNull FindUserDto findByUsername(@NonNull String username) {
+    public @NonNull UserResponseDto findByUsername(@NonNull String username) {
 
         return userRepo.findByUsername(username)
-                .map(Mapper::toFindUser)
+                .map(MapperUtils::toFindUser)
                 .orElseThrow(() -> new RuntimeException("user" + username + " not found"));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public @NonNull FindUserDto findById(@NonNull Long id) {
+    public @NonNull UserResponseDto findById(@NonNull Long id) {
         return userRepo.findById(id)
-                .map(Mapper::toFindUser)
+                .map(MapperUtils::toFindUser)
                 .orElseThrow(() -> new RuntimeException("user" + id + " not found"));
     }
 
     @Override
     @Transactional
-    public boolean create(@NonNull CreateUserDto dto) {
+    public boolean create(@NonNull UserCreateRequestDto dto) {
 
         if (userRepo.existsByUsername(dto.username())) {
             throw new UserAlreadyExistException(dto.username());
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         final Set<Permission> currentPermissions = dto.permissions() != null ?
                 permissionRepo.findAllByNameIn(dto.permissions()) : Set.of();
 
-        User user = Mapper.toUser(dto);
+        User user = MapperUtils.toUser(dto);
 
         currentRole.forEach(user::addRole);
         currentPermissions.forEach(user::addPermission);

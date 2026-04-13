@@ -1,17 +1,21 @@
 package com.nikolaihoretski.tests.mapper;
 
-import com.nikolaihoretski.tests.dto.CreateUserDto;
-import com.nikolaihoretski.tests.dto.FindUserDto;
+import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
+import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.model.User;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Mapper {
+public class MapperUtils {
+
+    private MapperUtils() {
+        throw new UnsupportedOperationException("MapperUtils is a utility class");
+    }
 
     private static final String DEFAULT_PREFIX = "ROLE_";
 
-    public static User toUser(CreateUserDto dto) {
+    public static User toUser(UserCreateRequestDto dto) {
 
         if (dto == null) {
             return null;
@@ -27,7 +31,7 @@ public class Mapper {
         return user;
     }
 
-    public static FindUserDto toFindUser(User user) {
+    public static UserResponseDto toFindUser(User user) {
 
         if (user == null) {
             return null;
@@ -41,7 +45,8 @@ public class Mapper {
                 .map(p -> p.getPermission().getName())
                 .collect(Collectors.toSet());
 
-        return new FindUserDto(
+        return new UserResponseDto(
+                user.getId(),
                 user.getUsername(),
                 user.getName(),
                 user.getEmail(),

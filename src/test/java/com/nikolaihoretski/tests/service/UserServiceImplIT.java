@@ -1,13 +1,12 @@
 package com.nikolaihoretski.tests.service;
 
-import com.nikolaihoretski.tests.dto.FindUserDto;
+import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.repo.PermissionRepo;
 import com.nikolaihoretski.tests.repo.RoleRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -18,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Testcontainers
 @Transactional
-@EnableJpaAuditing
 class UserServiceImplIT {
 
     @Container
@@ -33,55 +31,28 @@ class UserServiceImplIT {
     private PermissionRepo permissionRepo;
 
     @Test
-    void shouldReturnUserDtoWhenUserExists() {
+    void shouldReturnFindUserDtoByUsernameWhenUserExists() {
 
-       String username = "admin";
+        final String username = "admin";
 
-        FindUserDto result = userService.findByUsername(username);
+        final UserResponseDto result = userService.findByUsername(username);
 
         assertNotNull(result);
-        assertEquals("admin", result.username());
+        assertEquals(username, result.username());
         assertTrue(result.roles().contains("ROLE_ADMIN"));
         assertTrue(result.permissions().contains("READ"));
     }
 
     @Test
-    void shouldCreateNewUserWithRolesAndPermissions() {
-//
-//        Role adminRole = Role.builder()
-//                .name("ROLE_ADMIN")
-//                .description("Admin role")
-//                .userRoles(new HashSet<>())
-//                .rolePermissions(new HashSet<>())
-//                .build();
-//        roleRepo.save(adminRole);
-//        Permission permission = Permission.builder()
-//                .name("WRITE")
-//                .description("write")
-//                .rolePermissions(new HashSet<>())
-//                .build();
-//
-//        UserDto dto = new UserDto(
-//                "horetski",
-//                "password123",
-//                "Nikolai",
-//                "nikolai@example.com",
-//                true,
-//                Set.of("ROLE_ADMIN"),
-//                Set.of("WRITE")
-//        );
-//
-//        boolean isCreated = userService.create(dto);
-//
-//        assertTrue(isCreated, "true");
-//        UserDto saveUser = userService.findByUsername("horetski");
-//
-//        assertNotNull(saveUser);
-//        assertEquals("horetski", saveUser.username());
-//        assertTrue(saveUser.roles().contains("ROLE_ADMIN"));
-//        assertTrue(saveUser.permissions().contains("WRITE"));
+    void shouldReturnFindUserDtoByIdWhenUserExists() {
+
+        final Long userId = 1L;
+
+        final UserResponseDto result = userService.findById(userId);
+
+        assertNotNull(result);
+        assertEquals(userId, result.id());
 
     }
-
 
 }

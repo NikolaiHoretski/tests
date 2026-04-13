@@ -1,7 +1,7 @@
 package com.nikolaihoretski.tests.controller;
 
-import com.nikolaihoretski.tests.dto.CreateUserDto;
-import com.nikolaihoretski.tests.dto.FindUserDto;
+import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
+import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,18 +16,18 @@ public class Controller {
     }
 
     @GetMapping("/user/{username}")
-    public FindUserDto findByUsername(@PathVariable String username) {
+    public UserResponseDto findByUsername(@PathVariable String username) {
         return userService.findByUsername(username);
     }
 
     @GetMapping("/userid/{id}")
-    public FindUserDto findById(@PathVariable Long id) {
+    public UserResponseDto findById(@PathVariable Long id) {
         return userService.findById(id);
     }
 
     @PostMapping("/users/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public boolean create (@RequestBody CreateUserDto dto) {
+    public boolean create (@RequestBody UserCreateRequestDto dto) {
         return userService.create(dto);
     }
 
