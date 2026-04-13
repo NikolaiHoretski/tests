@@ -54,7 +54,7 @@ public class User implements Serializable {
     @Column(name = "updated_by")
     private String updateBy;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserRole> userRoles = new HashSet<>();
 
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
@@ -63,7 +63,7 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "updatedBy", fetch = FetchType.LAZY)
     private Set<UserRole> updateUserRole = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserPermission> userPermissions = new HashSet<>();
 
 

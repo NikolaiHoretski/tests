@@ -32,4 +32,9 @@ public class Controller {
         return userService.create(dto);
     }
 
+    @PatchMapping("/users/update")
+    public UserResponseWithIdUsernameDto update(@RequestBody UserCreateRequestDto dto) {
+        return userService.update(dto);
+    }
+
 }

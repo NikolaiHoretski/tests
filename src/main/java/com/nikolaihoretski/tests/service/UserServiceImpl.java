@@ -4,6 +4,7 @@ import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
+import com.nikolaihoretski.tests.exception.UserNotFoundException;
 import com.nikolaihoretski.tests.mapper.MapperUtils;
 import com.nikolaihoretski.tests.model.Permission;
 import com.nikolaihoretski.tests.model.Role;
@@ -11,11 +12,13 @@ import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.PermissionRepo;
 import com.nikolaihoretski.tests.repo.RoleRepo;
 import com.nikolaihoretski.tests.repo.UserRepo;
+import liquibase.util.StringUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -27,6 +30,8 @@ public class UserServiceImpl implements UserService {
     private final RoleRepo roleRepo;
 
     private final PermissionRepo permissionRepo;
+
+    private static final String DEFAULT_UPDATE_LOG_CONSTRAINT = "user field <{}> in user <{}> was updated to field <{}>";
 
     public UserServiceImpl(UserRepo userRepo, RoleRepo roleRepo, PermissionRepo permissionRepo) {
         this.userRepo = userRepo;
@@ -42,7 +47,7 @@ public class UserServiceImpl implements UserService {
                 .map(MapperUtils::toFindUser)
                 .orElseThrow(() -> new RuntimeException("user" + username + " not found"));
 
-        log.info("check user on findByUserName method. User with username {} was found", username);
+        log.info("check user on findByUserName method. User with username <{}> was found", username);
 
         return responseDto;
     }
@@ -55,20 +60,20 @@ public class UserServiceImpl implements UserService {
                 .map(MapperUtils::toFindUser)
                 .orElseThrow(() -> new RuntimeException("user" + id + " not found"));
 
-        log.info("Check user on findById method. User with id {} was found", id);
+        log.info("Check user on findById method. User with id <{}> was found", id);
 
         return responseDto;
     }
 
     @Override
     @Transactional
-    public UserResponseWithIdUsernameDto create(@NonNull UserCreateRequestDto createRequestDto) {
+    public @NonNull UserResponseWithIdUsernameDto create(@NonNull UserCreateRequestDto createRequestDto) {
 
         if (userRepo.existsByUsername(createRequestDto.username())) {
             throw new UserAlreadyExistException(createRequestDto.username());
         }
 
-        log.info("Check exists of user in create method. User with username {} exists", createRequestDto.username());
+        log.info("Check exists of user in create method. User with username <{}> exists", createRequestDto.username());
 
         final Set<Role> currentRole = (createRequestDto.roles() != null) ? roleRepo.findAllByNameIn(createRequestDto.roles()) : Set.of();
         final Set<Permission> currentPermissions = createRequestDto.permissions() != null ?
@@ -81,12 +86,53 @@ public class UserServiceImpl implements UserService {
 
         userRepo.save(user);
 
-        log.info("User with username {}, and id {} was saved", user.getUsername(), user.getId());
+        log.info("User with username <{}>, and id <{}> was saved", user.getUsername(), user.getId());
 
         return new UserResponseWithIdUsernameDto(
                 user.getId(),
                 user.getUsername()
         );
+    }
+
+    //only for user, not for admin
+    @Override
+    @Transactional
+    public @NonNull UserResponseWithIdUsernameDto update(@NonNull UserCreateRequestDto createRequestDto) {
+
+        User user = userRepo.findByUsername(createRequestDto.username())
+                .orElseThrow(() -> new UserNotFoundException(createRequestDto.username()));
+
+        final String password = user.getPassword();
+        final String name = user.getName();
+        final String email = user.getEmail();
+
+        log.info("user with username <{}> was found", createRequestDto.username());
+
+        if (!Objects.isNull(createRequestDto.password()) &&
+                !Objects.equals(createRequestDto.password(), user.getPassword())) {
+            user.setPassword(createRequestDto.password());
+            log.info(
+                    DEFAULT_UPDATE_LOG_CONSTRAINT,
+                    password, user.getUsername(), user.getPassword());
+        }
+        if (!Objects.isNull(createRequestDto.name()) && !Objects.equals(createRequestDto.name(), user.getName())) {
+            user.setName(createRequestDto.name());
+            log.info(
+                    DEFAULT_UPDATE_LOG_CONSTRAINT,
+                    name, user.getUsername(), user.getName());
+        }
+        if (!Objects.isNull(createRequestDto.email()) && !Objects.equals(createRequestDto.email(), user.getEmail())) {
+            user.setEmail(createRequestDto.email());
+            log.info(
+                    DEFAULT_UPDATE_LOG_CONSTRAINT,
+                    email, user.getUsername(), user.getEmail());
+        }
+
+        User updatedUser = userRepo.save(user);
+
+        return new UserResponseWithIdUsernameDto(
+                updatedUser.getId(),
+                updatedUser.getUsername());
     }
 
 }

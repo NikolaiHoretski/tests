@@ -13,5 +13,9 @@ public interface UserService {
     @NonNull
     UserResponseDto findById(@NonNull Long id);
 
+    @NonNull
     UserResponseWithIdUsernameDto create(@NonNull UserCreateRequestDto userDto);
+
+    @NonNull
+    UserResponseWithIdUsernameDto update(@NonNull UserCreateRequestDto userDto);
 }
