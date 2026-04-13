@@ -2,6 +2,7 @@ package com.nikolaihoretski.tests.service;
 
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
+import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import lombok.NonNull;
 
 public interface UserService {
@@ -12,5 +13,5 @@ public interface UserService {
     @NonNull
     UserResponseDto findById(@NonNull Long id);
 
-    boolean create(@NonNull UserCreateRequestDto userDto);
+    UserResponseWithIdUsernameDto create(@NonNull UserCreateRequestDto userDto);
 }

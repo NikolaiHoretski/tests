@@ -2,6 +2,7 @@ package com.nikolaihoretski.tests.controller;
 
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
+import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class Controller {
 
     @PostMapping("/users/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public boolean create (@RequestBody UserCreateRequestDto dto) {
+    public UserResponseWithIdUsernameDto create (@RequestBody UserCreateRequestDto dto) {
         return userService.create(dto);
     }
 

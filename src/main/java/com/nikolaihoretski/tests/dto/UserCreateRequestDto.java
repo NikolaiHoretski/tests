@@ -7,7 +7,6 @@ public record UserCreateRequestDto(
         String name,
         String password,
         String email,
-        String isEnabled,
         Set<String> roles,
         Set<String> permissions
 ) {
