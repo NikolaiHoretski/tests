@@ -4,7 +4,7 @@ import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserNotFoundException;
 import com.nikolaihoretski.tests.model.User;
-import com.nikolaihoretski.tests.repo.JpaRepo;
+import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,20 +16,20 @@ import java.util.Objects;
 @Service
 public class ClientCrudServiceImpl implements ClientCrudService {
 
-    private final JpaRepo jpaRepo;
+    private final JpaUserRepo jpaUserRepo;
 
     private static final String DEFAULT_UPDATE_LOG_CONSTRAINT =
             "user field <{}> in user with id <{}> and username <{}> was updated to field <{}>";
 
-    public ClientCrudServiceImpl(JpaRepo jpaRepo) {
-        this.jpaRepo = jpaRepo;
+    public ClientCrudServiceImpl(JpaUserRepo jpaUserRepo) {
+        this.jpaUserRepo = jpaUserRepo;
     }
 
     @Override
     @Transactional
     public @NonNull UserResponseWithIdUsernameDto update(@NonNull UserUpdateRequestDto updateRequestDto) {
 
-        final User user = jpaRepo.findById(updateRequestDto.id())
+        final User user = jpaUserRepo.findById(updateRequestDto.id())
                 .orElseThrow(() -> new UserNotFoundException(updateRequestDto.id()));
 
         final String password = user.getPassword();
@@ -58,7 +58,7 @@ public class ClientCrudServiceImpl implements ClientCrudService {
                     email, user.getId(), user.getUsername(), user.getEmail());
         }
 
-        final User updatedUser = jpaRepo.save(user);
+        final User updatedUser = jpaUserRepo.save(user);
 
         return new UserResponseWithIdUsernameDto(
                 updatedUser.getId(),

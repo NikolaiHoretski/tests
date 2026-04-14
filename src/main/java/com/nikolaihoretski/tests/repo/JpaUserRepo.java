@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface JpaRepo extends JpaRepository<User, Long> {
+public interface JpaUserRepo extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = {
             "userRoles.role",

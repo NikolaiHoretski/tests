@@ -6,7 +6,7 @@ import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
 import com.nikolaihoretski.tests.model.User;
-import com.nikolaihoretski.tests.repo.JpaRepo;
+import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +34,7 @@ class ClientCrudServiceImplIT {
     @Autowired
     private ClientCrudService clientCrudService;
     @Autowired
-    private JpaRepo jpaRepo;
+    private JpaUserRepo jpaUserRepo;
 
     @Test
     void shouldReturnFindUserDtoByUsernameWhenUserExists() {
@@ -80,7 +80,7 @@ class ClientCrudServiceImplIT {
         assertNotNull(actualResult);
         assertEquals(createRequestDto.username(), actualResult.username());
 
-        assertTrue(jpaRepo.existsByUsername(createRequestDto.username()));
+        assertTrue(jpaUserRepo.existsByUsername(createRequestDto.username()));
     }
 
     @Test
@@ -92,7 +92,7 @@ class ClientCrudServiceImplIT {
         existingUser.setEmail("admin123@admin.by");
         existingUser.setName("admin");
 
-        jpaRepo.save(existingUser);
+        jpaUserRepo.save(existingUser);
 
         UserCreateRequestDto actualResult = new UserCreateRequestDto(
                 "admin123",
@@ -116,7 +116,7 @@ class ClientCrudServiceImplIT {
         existingUser.setEmail("me@me.by");
         existingUser.setName("me");
 
-        jpaRepo.save(existingUser);
+        jpaUserRepo.save(existingUser);
 
         UserUpdateRequestDto createRequestDto = new UserUpdateRequestDto(
                 1L,

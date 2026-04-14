@@ -1,6 +1,6 @@
 package com.nikolaihoretski.tests.service.secutity;
 
-import com.nikolaihoretski.tests.repo.JpaRepo;
+import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import lombok.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,12 +15,12 @@ import java.util.List;
 @Service
 public class JpaUserDetailService implements UserDetailsService {
 
-    private final JpaRepo jpaRepo;
+    private final JpaUserRepo jpaUserRepo;
 
     private static final String ROLE_PREFIX = "ROLE_";
 
-    public JpaUserDetailService(JpaRepo jpaRepo) {
-        this.jpaRepo = jpaRepo;
+    public JpaUserDetailService(JpaUserRepo jpaUserRepo) {
+        this.jpaUserRepo = jpaUserRepo;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class JpaUserDetailService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
 
-        return jpaRepo.findByUsername(username)
+        return jpaUserRepo.findByUsername(username)
                 .map(user -> {
                    final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 

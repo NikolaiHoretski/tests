@@ -8,9 +8,9 @@ import com.nikolaihoretski.tests.mapper.AccountMapper;
 import com.nikolaihoretski.tests.model.Permission;
 import com.nikolaihoretski.tests.model.Role;
 import com.nikolaihoretski.tests.model.User;
-import com.nikolaihoretski.tests.repo.PermissionRepo;
-import com.nikolaihoretski.tests.repo.RoleRepo;
-import com.nikolaihoretski.tests.repo.JpaRepo;
+import com.nikolaihoretski.tests.repo.JpaPermissionRepo;
+import com.nikolaihoretski.tests.repo.JpaRoleRepo;
+import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,20 +23,20 @@ import java.util.Set;
 @Service
 public class AdminCrudServiceImpl implements AdminCrudService{
 
-    private final JpaRepo jpaRepo;
+    private final JpaUserRepo jpaUserRepo;
 
-    private final RoleRepo roleRepo;
+    private final JpaRoleRepo jpaRoleRepo;
 
-    private final PermissionRepo permissionRepo;
+    private final JpaPermissionRepo jpaPermissionRepo;
 
     private final AccountMapper accountMapper;
 
     private final PasswordEncoder passwordEncoder;
 
-    public AdminCrudServiceImpl(JpaRepo jpaRepo, RoleRepo roleRepo, PermissionRepo permissionRepo, AccountMapper accountMapper, PasswordEncoder passwordEncoder) {
-        this.jpaRepo = jpaRepo;
-        this.roleRepo = roleRepo;
-        this.permissionRepo = permissionRepo;
+    public AdminCrudServiceImpl(JpaUserRepo jpaUserRepo, JpaRoleRepo jpaRoleRepo, JpaPermissionRepo jpaPermissionRepo, AccountMapper accountMapper, PasswordEncoder passwordEncoder) {
+        this.jpaUserRepo = jpaUserRepo;
+        this.jpaRoleRepo = jpaRoleRepo;
+        this.jpaPermissionRepo = jpaPermissionRepo;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
     }
@@ -45,7 +45,7 @@ public class AdminCrudServiceImpl implements AdminCrudService{
     @Transactional(readOnly = true)
     public @NonNull UserResponseDto findByUsername(@NonNull String username) {
 
-        final UserResponseDto responseDto = jpaRepo.findByUsername(username)
+        final UserResponseDto responseDto = jpaUserRepo.findByUsername(username)
                 .map(accountMapper::toUserResponseDto)
                 .orElseThrow(() -> new RuntimeException("user" + username + " not found"));
 
@@ -58,7 +58,7 @@ public class AdminCrudServiceImpl implements AdminCrudService{
     @Transactional(readOnly = true)
     public @NonNull UserResponseDto findById(@NonNull Long id) {
 
-        final UserResponseDto responseDto = jpaRepo.findById(id)
+        final UserResponseDto responseDto = jpaUserRepo.findById(id)
                 .map(accountMapper::toUserResponseDto)
                 .orElseThrow(() -> new RuntimeException("user" + id + " not found"));
 
@@ -71,15 +71,15 @@ public class AdminCrudServiceImpl implements AdminCrudService{
     @Transactional
     public @NonNull UserResponseWithIdUsernameDto createForAdmin(@NonNull UserCreateRequestDto createRequestDto) {
 
-        if (jpaRepo.existsByUsername(createRequestDto.username())) {
+        if (jpaUserRepo.existsByUsername(createRequestDto.username())) {
             throw new UserAlreadyExistException(createRequestDto.username());
         }
 
         log.info("Check exists of user in createForAdmin method. User with username <{}> exists", createRequestDto.username());
 
-        final Set<Role> currentRole = (createRequestDto.roles() != null) ? roleRepo.findAllByNameIn(createRequestDto.roles()) : Set.of();
+        final Set<Role> currentRole = (createRequestDto.roles() != null) ? jpaRoleRepo.findAllByNameIn(createRequestDto.roles()) : Set.of();
         final Set<Permission> currentPermissions = createRequestDto.permissions() != null ?
-                permissionRepo.findAllByNameIn(createRequestDto.permissions()) : Set.of();
+                jpaPermissionRepo.findAllByNameIn(createRequestDto.permissions()) : Set.of();
 
         final User user = accountMapper.toUser(createRequestDto);
 
@@ -89,7 +89,7 @@ public class AdminCrudServiceImpl implements AdminCrudService{
         currentRole.forEach(user::addRole);
         currentPermissions.forEach(user::addPermission);
 
-        jpaRepo.save(user);
+        jpaUserRepo.save(user);
 
         log.info("User with username <{}>, and id <{}> was saved", user.getUsername(), user.getId());
 

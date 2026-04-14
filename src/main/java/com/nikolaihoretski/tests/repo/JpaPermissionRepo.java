@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.Set;
 
-public interface PermissionRepo extends JpaRepository<Permission, Long> {
+public interface JpaPermissionRepo extends JpaRepository<Permission, Long> {
 
     Optional<Permission> findByName(@NonNull String name);
 
