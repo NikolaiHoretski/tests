@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class Role extends BaseEntity<User> {
+public class Role extends BaseEntity<Long> {
 
     @Serial
     private static final long serialVersionUID = 1L;

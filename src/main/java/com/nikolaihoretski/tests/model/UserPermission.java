@@ -19,7 +19,7 @@ import java.io.Serial;
         @UniqueConstraint(name = "uk_role_permission", columnNames = {
                 "user_id", "permission_id"
         })})
-public class UserPermission extends BaseEntity<User> {
+public class UserPermission extends BaseEntity<Long> {
 
     @Serial
     private static final long serialVersionUID = 1L;

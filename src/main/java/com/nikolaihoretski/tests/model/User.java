@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-public class User extends BaseEntity<User> {
+public class User extends BaseEntity<Long> {
 
     @Serial
     private static final long serialVersionUID = 1L;

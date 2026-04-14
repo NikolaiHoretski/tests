@@ -4,7 +4,6 @@ import com.nikolaihoretski.tests.dto.LoginDto;
 import com.nikolaihoretski.tests.dto.TokenResponseDto;
 import com.nikolaihoretski.tests.service.secutity.AuthenticationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -12,7 +12,7 @@ import java.io.Serial;
 @Getter
 @Setter
 @Builder
-public class Permission extends BaseEntity<User> {
+public class Permission extends BaseEntity<Long> {
 
     @Serial
     private static final long serialVersionUID = 1L;

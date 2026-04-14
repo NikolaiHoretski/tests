@@ -10,8 +10,6 @@ import lombok.NonNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,13 +17,8 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public abstract class AccountMapper {
 
-    @Autowired
-    protected PasswordEncoder passwordEncoder;
-
     private static final String DEFAULT_PREFIX = "ROLE_";
 
-    @Mapping(target = "enabled", constant = "true")
-    @Mapping(target = "password", expression = "java(passwordEncoder.encode(dto.password()))")
     public abstract User toUser(@NonNull UserCreateRequestDto dto);
 
     @Mapping(target = "isEnabled", source = "enabled")

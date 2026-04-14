@@ -6,9 +6,7 @@ import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
 import com.nikolaihoretski.tests.model.User;
-import com.nikolaihoretski.tests.repo.PermissionRepo;
-import com.nikolaihoretski.tests.repo.RoleRepo;
-import com.nikolaihoretski.tests.repo.UserRepo;
+import com.nikolaihoretski.tests.repo.JpaRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,27 +23,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Testcontainers
 @Transactional
-class UserServiceImplIT {
+class ClientCrudServiceImplIT {
 
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine");
 
     @Autowired
-    private UserService userService;
+    private AdminCrudService adminCrudService;
     @Autowired
-    private UserRepo userRepo;
+    private ClientCrudService clientCrudService;
     @Autowired
-    private RoleRepo roleRepo;
-    @Autowired
-    private PermissionRepo permissionRepo;
+    private JpaRepo jpaRepo;
 
     @Test
     void shouldReturnFindUserDtoByUsernameWhenUserExists() {
 
         final String username = "admin";
 
-        final UserResponseDto actualResult = userService.findByUsername(username);
+        final UserResponseDto actualResult = adminCrudService.findByUsername(username);
 
         assertNotNull(actualResult);
         assertEquals(username, actualResult.username());
@@ -58,7 +54,7 @@ class UserServiceImplIT {
 
         final Long userId = 1L;
 
-        final UserResponseDto actualResult = userService.findById(userId);
+        final UserResponseDto actualResult = adminCrudService.findById(userId);
 
         assertNotNull(actualResult);
         assertEquals(userId, actualResult.id());
@@ -79,12 +75,12 @@ class UserServiceImplIT {
                 Set.of("WRITE")
         );
 
-        UserResponseWithIdUsernameDto actualResult = userService.createForAdmin(createRequestDto);
+        UserResponseWithIdUsernameDto actualResult = adminCrudService.createForAdmin(createRequestDto);
 
         assertNotNull(actualResult);
         assertEquals(createRequestDto.username(), actualResult.username());
 
-        assertTrue(userRepo.existsByUsername(createRequestDto.username()));
+        assertTrue(jpaRepo.existsByUsername(createRequestDto.username()));
     }
 
     @Test
@@ -96,7 +92,7 @@ class UserServiceImplIT {
         existingUser.setEmail("admin123@admin.by");
         existingUser.setName("admin");
 
-        userRepo.save(existingUser);
+        jpaRepo.save(existingUser);
 
         UserCreateRequestDto actualResult = new UserCreateRequestDto(
                 "admin123",
@@ -107,7 +103,7 @@ class UserServiceImplIT {
                 Set.of("WRITE")
         );
 
-        assertThrows(UserAlreadyExistException.class, () -> userService.createForAdmin(actualResult));
+        assertThrows(UserAlreadyExistException.class, () -> adminCrudService.createForAdmin(actualResult));
     }
 
     @Test
@@ -120,7 +116,7 @@ class UserServiceImplIT {
         existingUser.setEmail("me@me.by");
         existingUser.setName("me");
 
-        userRepo.save(existingUser);
+        jpaRepo.save(existingUser);
 
         UserUpdateRequestDto createRequestDto = new UserUpdateRequestDto(
                 1L,
@@ -129,7 +125,7 @@ class UserServiceImplIT {
                 null
         );
 
-        UserResponseWithIdUsernameDto actualResult = userService.update(createRequestDto);
+        UserResponseWithIdUsernameDto actualResult = clientCrudService.update(createRequestDto);
 
         assertNotNull(actualResult);
     }

@@ -31,12 +31,10 @@ public abstract class BaseEntity<U extends Serializable> implements Serializable
     private LocalDateTime updatedAt;
 
     @CreatedBy
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", updatable = false)
     private U createdBy;
 
     @LastModifiedBy
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     private U updatedBy;
 

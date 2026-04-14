@@ -3,29 +3,27 @@ package com.nikolaihoretski.tests.service;
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
-import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
-import com.nikolaihoretski.tests.exception.UserNotFoundException;
 import com.nikolaihoretski.tests.mapper.AccountMapper;
 import com.nikolaihoretski.tests.model.Permission;
 import com.nikolaihoretski.tests.model.Role;
 import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.PermissionRepo;
 import com.nikolaihoretski.tests.repo.RoleRepo;
-import com.nikolaihoretski.tests.repo.UserRepo;
+import com.nikolaihoretski.tests.repo.JpaRepo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class AdminCrudServiceImpl implements AdminCrudService{
 
-    private final UserRepo userRepo;
+    private final JpaRepo jpaRepo;
 
     private final RoleRepo roleRepo;
 
@@ -33,21 +31,21 @@ public class UserServiceImpl implements UserService {
 
     private final AccountMapper accountMapper;
 
-    private static final String DEFAULT_UPDATE_LOG_CONSTRAINT =
-            "user field <{}> in user with id <{}> and username <{}> was updated to field <{}>";
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepo userRepo, RoleRepo roleRepo, PermissionRepo permissionRepo, AccountMapper accountMapper) {
-        this.userRepo = userRepo;
+    public AdminCrudServiceImpl(JpaRepo jpaRepo, RoleRepo roleRepo, PermissionRepo permissionRepo, AccountMapper accountMapper, PasswordEncoder passwordEncoder) {
+        this.jpaRepo = jpaRepo;
         this.roleRepo = roleRepo;
         this.permissionRepo = permissionRepo;
         this.accountMapper = accountMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional(readOnly = true)
     public @NonNull UserResponseDto findByUsername(@NonNull String username) {
 
-        final UserResponseDto responseDto = userRepo.findByUsername(username)
+        final UserResponseDto responseDto = jpaRepo.findByUsername(username)
                 .map(accountMapper::toUserResponseDto)
                 .orElseThrow(() -> new RuntimeException("user" + username + " not found"));
 
@@ -60,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public @NonNull UserResponseDto findById(@NonNull Long id) {
 
-        final UserResponseDto responseDto = userRepo.findById(id)
+        final UserResponseDto responseDto = jpaRepo.findById(id)
                 .map(accountMapper::toUserResponseDto)
                 .orElseThrow(() -> new RuntimeException("user" + id + " not found"));
 
@@ -73,7 +71,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public @NonNull UserResponseWithIdUsernameDto createForAdmin(@NonNull UserCreateRequestDto createRequestDto) {
 
-        if (userRepo.existsByUsername(createRequestDto.username())) {
+        if (jpaRepo.existsByUsername(createRequestDto.username())) {
             throw new UserAlreadyExistException(createRequestDto.username());
         }
 
@@ -85,10 +83,13 @@ public class UserServiceImpl implements UserService {
 
         final User user = accountMapper.toUser(createRequestDto);
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setEnabled(true);
+
         currentRole.forEach(user::addRole);
         currentPermissions.forEach(user::addPermission);
 
-        userRepo.save(user);
+        jpaRepo.save(user);
 
         log.info("User with username <{}>, and id <{}> was saved", user.getUsername(), user.getId());
 
@@ -96,47 +97,6 @@ public class UserServiceImpl implements UserService {
                 user.getId(),
                 user.getUsername()
         );
-    }
-
-    //only for user/client, not for admin
-    @Override
-    @Transactional
-    public @NonNull UserResponseWithIdUsernameDto update(@NonNull UserUpdateRequestDto updateRequestDto) {
-
-        final User user = userRepo.findById(updateRequestDto.id())
-                .orElseThrow(() -> new UserNotFoundException(updateRequestDto.id()));
-
-        final String password = user.getPassword();
-        final String name = user.getName();
-        final String email = user.getEmail();
-
-        log.info("user with id <{}> and username <{}> was found", user.getId(), user.getUsername());
-
-        if (!Objects.isNull(updateRequestDto.password()) &&
-                !Objects.equals(updateRequestDto.password(), user.getPassword())) {
-            user.setPassword(updateRequestDto.password());
-            log.info(
-                    DEFAULT_UPDATE_LOG_CONSTRAINT,
-                    password, user.getId(), user.getUsername(), user.getPassword());
-        }
-        if (!Objects.isNull(updateRequestDto.name()) && !Objects.equals(updateRequestDto.name(), user.getName())) {
-            user.setName(updateRequestDto.name());
-            log.info(
-                    DEFAULT_UPDATE_LOG_CONSTRAINT,
-                    name, user.getId(), user.getUsername(), user.getName());
-        }
-        if (!Objects.isNull(updateRequestDto.email()) && !Objects.equals(updateRequestDto.email(), user.getEmail())) {
-            user.setEmail(updateRequestDto.email());
-            log.info(
-                    DEFAULT_UPDATE_LOG_CONSTRAINT,
-                    email, user.getId(), user.getUsername(), user.getEmail());
-        }
-
-        final User updatedUser = userRepo.save(user);
-
-        return new UserResponseWithIdUsernameDto(
-                updatedUser.getId(),
-                updatedUser.getUsername());
     }
 
 }

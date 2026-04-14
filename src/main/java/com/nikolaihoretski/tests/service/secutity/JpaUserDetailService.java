@@ -1,26 +1,26 @@
 package com.nikolaihoretski.tests.service.secutity;
 
-import com.nikolaihoretski.tests.repo.UserRepo;
+import com.nikolaihoretski.tests.repo.JpaRepo;
 import lombok.NonNull;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class JpaUserDetailService implements UserDetailsService {
 
-    private final UserRepo userRepo;
+    private final JpaRepo jpaRepo;
 
     private static final String ROLE_PREFIX = "ROLE_";
 
-    public JpaUserDetailService(UserRepo userRepo) {
-        this.userRepo = userRepo;
+    public JpaUserDetailService(JpaRepo jpaRepo) {
+        this.jpaRepo = jpaRepo;
     }
 
     @Override
@@ -28,24 +28,23 @@ public class JpaUserDetailService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
 
-        return userRepo.findByUsername(username)
+        return jpaRepo.findByUsername(username)
                 .map(user -> {
-                    Set<String> authorities = user.getUserRoles()
-                            .stream()
-                            .map(userRole -> ROLE_PREFIX + userRole.getRole().getName())
-                            .collect(Collectors.toSet());
+                   final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-                    user.getUserPermissions().stream()
-                            .map(userPermission -> userPermission.getPermission().getName())
-                            .forEach(authorities::add);
+                   user.getUserRoles().forEach(role ->
+                           authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole().getName())));
 
-                    return User.builder()
-                            .username(user.getUsername())
-                            .password(user.getPassword())
-                            .disabled(!user.isEnabled())
-                            .authorities(authorities.toArray(String[]::new))
-                            .build();
+                   user.getUserPermissions().forEach(permission ->
+                           authorities.add(new SimpleGrantedAuthority(permission.getPermission().getName())));
 
+                    return new CustomUserDetails(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getPassword(),
+                            user.isEnabled(),
+                            authorities
+                    );
                 })
                 .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
     }
