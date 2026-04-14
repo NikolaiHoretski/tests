@@ -1,4 +1,4 @@
-package com.nikolaihoretski.tests.service;
+package com.nikolaihoretski.tests.service.admin;
 
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;

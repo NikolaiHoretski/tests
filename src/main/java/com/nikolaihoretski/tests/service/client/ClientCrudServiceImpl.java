@@ -1,4 +1,4 @@
-package com.nikolaihoretski.tests.service;
+package com.nikolaihoretski.tests.service.client;
 
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;

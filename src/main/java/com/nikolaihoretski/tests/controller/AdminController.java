@@ -3,7 +3,7 @@ package com.nikolaihoretski.tests.controller;
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
-import com.nikolaihoretski.tests.service.AdminCrudService;
+import com.nikolaihoretski.tests.service.admin.AdminCrudService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

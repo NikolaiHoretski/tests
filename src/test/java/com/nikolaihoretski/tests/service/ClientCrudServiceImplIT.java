@@ -7,6 +7,8 @@ import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
 import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
+import com.nikolaihoretski.tests.service.admin.AdminCrudService;
+import com.nikolaihoretski.tests.service.client.ClientCrudService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

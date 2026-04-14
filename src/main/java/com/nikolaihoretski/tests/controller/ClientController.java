@@ -2,7 +2,7 @@ package com.nikolaihoretski.tests.controller;
 
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
-import com.nikolaihoretski.tests.service.ClientCrudService;
+import com.nikolaihoretski.tests.service.client.ClientCrudService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
