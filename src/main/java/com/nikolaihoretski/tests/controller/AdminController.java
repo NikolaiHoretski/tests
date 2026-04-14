@@ -5,8 +5,11 @@ import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.service.admin.AdminCrudService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -16,6 +19,11 @@ public class AdminController {
 
     public AdminController(AdminCrudService adminCrudService) {
         this.adminCrudService = adminCrudService;
+    }
+
+    @GetMapping("/findall")
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        return ResponseEntity.ok(adminCrudService.findAll());
     }
 
     @GetMapping("/{username}")
@@ -35,6 +43,13 @@ public class AdminController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseWithIdUsernameDto create(@RequestBody UserCreateRequestDto dto) {
         return adminCrudService.createForAdmin(dto);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.dto.RoleAccess).ADMIN.name())")
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        adminCrudService.delete(id);
+        return ResponseEntity.ok(true);
     }
 
 }

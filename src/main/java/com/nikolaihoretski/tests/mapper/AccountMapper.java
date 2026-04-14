@@ -11,6 +11,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,8 @@ public abstract class AccountMapper {
                 .map(userPermission -> userPermission.getPermission().getName())
                 .collect(Collectors.toSet());
     }
+
+    public abstract List<UserResponseDto> toUserResponseDtos(List<User> users);
 
 }
 

@@ -4,7 +4,10 @@ import com.nikolaihoretski.tests.model.User;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -27,5 +30,12 @@ public interface JpaUserRepo extends JpaRepository<User, Long> {
 
 
     boolean existsByUsername(@NonNull String username);
+
+
+    @Override
+    @Modifying
+    @Transactional
+    @Query("update User u set u.isEnabled = false, u.isDeleted = true where u.id = :id")
+    void deleteById(@NonNull Long id);
 
 }

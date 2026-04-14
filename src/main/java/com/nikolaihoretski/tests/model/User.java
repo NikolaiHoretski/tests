@@ -34,6 +34,9 @@ public class User extends BaseEntity<Long> {
     @Column(name = "is_enabled", nullable = false)
     private boolean isEnabled = true;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserRole> userRoles = new HashSet<>();
 

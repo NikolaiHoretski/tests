@@ -10,12 +10,13 @@ VALUES ('READ', 'read data', 1),
        ('EXECUTE', 'execute data', 1),
        ('UPDATE', 'update data', 1),
        ('CREATE', 'createForAdmin data', 1);
-INSERT INTO users(username, password, name, email, is_enabled, created_by)
+INSERT INTO users(username, password, name, email, is_enabled, is_deleted, created_by)
 VALUES ('admin',
         '$argon2i$v=19$m=64,t=3,p=1$ZE1ZUjlQZUZ5bFEwbVdqRQ$lyo53Yo/K1Q0NbAefdz/kA',
         'Nikolai',
         'admin@admin.by',
         true,
+        false,
         1);
 
 INSERT INTO user_roles(user_id, role_id, created_by)

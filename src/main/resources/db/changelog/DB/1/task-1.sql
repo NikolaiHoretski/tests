@@ -28,6 +28,7 @@ create table users
     name       VARCHAR(255),
     email      VARCHAR(255),
     is_enabled bool         NOT NULL DEFAULT TRUE,
+    is_deleted bool         NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     created_by BIGINT,
