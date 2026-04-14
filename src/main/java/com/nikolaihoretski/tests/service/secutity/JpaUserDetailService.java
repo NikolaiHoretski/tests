@@ -17,7 +17,7 @@ public class JpaUserDetailService implements UserDetailsService {
 
     private final UserRepo userRepo;
 
-    private static final String ROLE_PREFIX = "ROLE";
+    private static final String ROLE_PREFIX = "ROLE_";
 
     public JpaUserDetailService(UserRepo userRepo) {
         this.userRepo = userRepo;

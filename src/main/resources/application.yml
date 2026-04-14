@@ -21,6 +21,9 @@ spring:
     analytics-enabled: true
     enabled: true
 
+secret:
+  key: "uSdJb9Hr8P+6v0z5RnVE1KBeWnKd7UoXK6pODsmEKOw="
+
 logging:
   level:
     org.springframework.web: DEBUG
@@ -34,3 +37,6 @@ server:
 springdoc:
   api-docs:
     path: /docs
+  swagger-ui:
+    path: /swagger-ui.html
+    url: /docs

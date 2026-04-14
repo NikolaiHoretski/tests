@@ -6,7 +6,7 @@ import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
 import com.nikolaihoretski.tests.exception.UserNotFoundException;
-import com.nikolaihoretski.tests.mapper.MapperUtils;
+import com.nikolaihoretski.tests.mapper.AccountMapper;
 import com.nikolaihoretski.tests.model.Permission;
 import com.nikolaihoretski.tests.model.Role;
 import com.nikolaihoretski.tests.model.User;
@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,13 +31,16 @@ public class UserServiceImpl implements UserService {
 
     private final PermissionRepo permissionRepo;
 
+    private final AccountMapper accountMapper;
+
     private static final String DEFAULT_UPDATE_LOG_CONSTRAINT =
             "user field <{}> in user with id <{}> and username <{}> was updated to field <{}>";
 
-    public UserServiceImpl(UserRepo userRepo, RoleRepo roleRepo, PermissionRepo permissionRepo) {
+    public UserServiceImpl(UserRepo userRepo, RoleRepo roleRepo, PermissionRepo permissionRepo, AccountMapper accountMapper) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.permissionRepo = permissionRepo;
+        this.accountMapper = accountMapper;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService {
     public @NonNull UserResponseDto findByUsername(@NonNull String username) {
 
         final UserResponseDto responseDto = userRepo.findByUsername(username)
-                .map(MapperUtils::toFindUser)
+                .map(accountMapper::toUserResponseDto)
                 .orElseThrow(() -> new RuntimeException("user" + username + " not found"));
 
         log.info("check user on findByUserName method. User with username <{}> was found", username);
@@ -59,7 +61,7 @@ public class UserServiceImpl implements UserService {
     public @NonNull UserResponseDto findById(@NonNull Long id) {
 
         final UserResponseDto responseDto = userRepo.findById(id)
-                .map(MapperUtils::toFindUser)
+                .map(accountMapper::toUserResponseDto)
                 .orElseThrow(() -> new RuntimeException("user" + id + " not found"));
 
         log.info("Check user on findById method. User with id <{}> was found", id);
@@ -81,7 +83,7 @@ public class UserServiceImpl implements UserService {
         final Set<Permission> currentPermissions = createRequestDto.permissions() != null ?
                 permissionRepo.findAllByNameIn(createRequestDto.permissions()) : Set.of();
 
-        final User user = MapperUtils.toUser(createRequestDto);
+        final User user = accountMapper.toUser(createRequestDto);
 
         currentRole.forEach(user::addRole);
         currentPermissions.forEach(user::addPermission);

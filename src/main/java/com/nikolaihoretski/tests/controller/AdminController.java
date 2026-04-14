@@ -4,6 +4,7 @@ import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,7 @@ public class AdminController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.dto.RoleAccess).ADMIN.name())")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseWithIdUsernameDto create (@RequestBody UserCreateRequestDto dto) {
         return userService.createForAdmin(dto);
