@@ -17,8 +17,6 @@ public class ApplicationStartLinkInLog {
         final String port = environment.getProperty("local.server.port");
         final String contextPath = environment.getProperty("server.servlet.context-path", "");
 
-        final String baseUrl = String.format("http://localhost:%s%s", port, contextPath);
-
         log.info("\nSwagger UI: http://localhost:{}{}/swagger-ui/index.html", port, contextPath);
     }
 
