@@ -9,5 +9,5 @@ public interface ClientCrudService {
     @NonNull
     UserResponseWithIdUsernameDto update(@NonNull UserUpdateRequestDto userDto);
 
-    void delete(@NonNull Long id);
+    void delete();
 }

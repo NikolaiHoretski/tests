@@ -2,13 +2,19 @@ package com.nikolaihoretski.tests.service.client;
 
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
+import com.nikolaihoretski.tests.exception.UserNotAuthenticationException;
 import com.nikolaihoretski.tests.exception.UserNotFoundException;
 import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
+import com.nikolaihoretski.tests.service.secutity.CustomUserDetails;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
 
@@ -66,8 +72,25 @@ public class ClientCrudServiceImpl implements ClientCrudService {
     }
 
     @Override
-    public void delete(@NonNull Long id) {
+    public void delete() {
 
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        final Object principle = authentication.getPrincipal();
+
+        if(!(principle instanceof CustomUserDetails details)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        final Long id = details.getId();
+
+        jpaUserRepo.deleteById(id);
+
+        log.info("user with id {}, was deleted", id);
     }
 
 }

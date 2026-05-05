@@ -7,7 +7,8 @@ import lombok.NonNull;
 public enum ErrorCode {
 
     USER_NOT_FOUND(40421, "User with %s %s not found"),
-    USER_ALREADY_EXIST(40422, "User with %s %s already exists");
+    USER_ALREADY_EXIST(40422, "User with %s %s already exists"),
+    USER_NOT_AUTH(40423, "User with %s %s not authentication");
 
     private final int code;
     private final String message;
