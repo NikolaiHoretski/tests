@@ -15,7 +15,11 @@ public class CustomUserDetails implements UserDetails {
     private final boolean isEnabled;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(Long id, String username, String password, boolean isEnabled, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(Long id,
+                             String username,
+                             String password,
+                             boolean isEnabled,
+                             Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;

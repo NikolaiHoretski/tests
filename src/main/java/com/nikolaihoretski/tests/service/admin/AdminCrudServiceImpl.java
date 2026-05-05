@@ -118,11 +118,15 @@ public class AdminCrudServiceImpl implements AdminCrudService {
             throw new UserAlreadyExistException(createRequestDto.username());
         }
 
-        log.info("Check exists of user in createForAdmin method. User with username <{}> exists", createRequestDto.username());
+        log.info("Check exists of user in createForAdmin method. User with username <{}> exists",
+                createRequestDto.username());
 
-        final Set<Role> currentRole = (createRequestDto.roles() != null) ? jpaRoleRepo.findAllByNameIn(createRequestDto.roles()) : Set.of();
+        final Set<Role> currentRole = (createRequestDto.roles() != null) ?
+                jpaRoleRepo.findAllByNameIn(createRequestDto.roles()) :
+                Set.of();
         final Set<Permission> currentPermissions = createRequestDto.permissions() != null ?
-                jpaPermissionRepo.findAllByNameIn(createRequestDto.permissions()) : Set.of();
+                jpaPermissionRepo.findAllByNameIn(createRequestDto.permissions()) :
+                Set.of();
 
         final User user = accountMapper.toUser(createRequestDto);
 

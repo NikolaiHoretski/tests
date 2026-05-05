@@ -20,7 +20,8 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtGeneratedFactoryService jwtGeneratedFactoryService;
 
-    public AuthenticationService(AuthenticationManager authenticationManager, JwtGeneratedFactoryService jwtGeneratedFactoryService) {
+    public AuthenticationService(AuthenticationManager authenticationManager,
+                                 JwtGeneratedFactoryService jwtGeneratedFactoryService) {
         this.authenticationManager = authenticationManager;
         this.jwtGeneratedFactoryService = jwtGeneratedFactoryService;
     }
