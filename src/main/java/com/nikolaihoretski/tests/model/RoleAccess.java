@@ -1,4 +1,4 @@
-package com.nikolaihoretski.tests.dto;
+package com.nikolaihoretski.tests.model;
 
 public enum RoleAccess {
     ADMIN,

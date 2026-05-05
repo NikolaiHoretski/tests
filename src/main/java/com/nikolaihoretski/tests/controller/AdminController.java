@@ -1,5 +1,6 @@
 package com.nikolaihoretski.tests.controller;
 
+import com.nikolaihoretski.tests.dto.DeleteUserResponseDto;
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
@@ -21,35 +22,45 @@ public class AdminController {
         this.adminCrudService = adminCrudService;
     }
 
-    @GetMapping("/findall")
+    @GetMapping("/getAll")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-        return ResponseEntity.ok(adminCrudService.findAll());
+        return ResponseEntity.ok(adminCrudService.getAll());
+    }
+
+    @GetMapping("/getAllDeletedUsers")
+    public ResponseEntity<List<DeleteUserResponseDto>> getAllDeleteUsers() {
+        return ResponseEntity.ok(adminCrudService.getAllDeleteUsers());
+    }
+
+    @GetMapping("/getAllDisabledUsers")
+    public ResponseEntity<List<UserResponseDto>> getAllDisabledUsers() {
+        return ResponseEntity.ok(adminCrudService.getAllDisableUsers());
     }
 
     @GetMapping("/{username}")
-    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.dto.RoleAccess).ADMIN.name())")
-    public UserResponseDto findByUsername(@PathVariable String username) {
-        return adminCrudService.findByUsername(username);
+    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.model.RoleAccess).ADMIN.name())")
+    public UserResponseDto getByUsername(@PathVariable String username) {
+        return adminCrudService.getByUsername(username);
     }
 
     @GetMapping("/userid/{id}")
-    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.dto.RoleAccess).ADMIN.name())")
-    public UserResponseDto findById(@PathVariable Long id) {
-        return adminCrudService.findById(id);
+    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.model.RoleAccess).ADMIN.name())")
+    public UserResponseDto getById(@PathVariable Long id) {
+        return adminCrudService.getById(id);
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.dto.RoleAccess).ADMIN.name())")
+    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.model.RoleAccess).ADMIN.name())")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseWithIdUsernameDto create(@RequestBody UserCreateRequestDto dto) {
         return adminCrudService.createForAdmin(dto);
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.dto.RoleAccess).ADMIN.name())")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+    @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.model.RoleAccess).ADMIN.name())")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         adminCrudService.delete(id);
-        return ResponseEntity.ok(true);
+        return ResponseEntity.noContent().build();
     }
 
 }

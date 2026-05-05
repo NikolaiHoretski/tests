@@ -1,5 +1,6 @@
 package com.nikolaihoretski.tests.service.admin;
 
+import com.nikolaihoretski.tests.dto.DeleteUserResponseDto;
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
@@ -14,6 +15,7 @@ import com.nikolaihoretski.tests.repo.JpaRoleRepo;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,23 +50,46 @@ public class AdminCrudServiceImpl implements AdminCrudService {
     }
 
     @Override
-    public @NonNull List<UserResponseDto> findAll() {
+    @Transactional(readOnly = true)
+    public @Nullable List<UserResponseDto> getAll() {
 
-        final List<User> users = jpaUserRepo.findAll().stream()
-                .filter(user -> !user.isDeleted())
-                .toList();
+        final List<User> users = jpaUserRepo.findAllByIsEnabledAndIsDeletedFalse(true, false);
 
-        return accountMapper.toUserResponseDtos(users);
+        log.info("find all users: {}", users);
+
+        return accountMapper.toUserResponseDtoList(users);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public @NonNull UserResponseDto findByUsername(@NonNull String username) {
+    public @Nullable List<DeleteUserResponseDto> getAllDeleteUsers() {
+
+        final List<User> users = jpaUserRepo.findAllByIsDeleted(true);
+
+        log.info("find all deleted users: {}", users);
+
+        return accountMapper.toDeleteUserResponseDtoList(users);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public @Nullable List<UserResponseDto> getAllDisableUsers() {
+
+        final List<User> users = jpaUserRepo.findAllByIsEnabled(false);
+
+        log.info("find all disabled users: {}", users);
+
+        return accountMapper.toUserResponseDtoList(users);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public @NonNull UserResponseDto getByUsername(@NonNull String username) {
 
         final UserResponseDto responseDto = jpaUserRepo.findByUsername(username)
                 .filter(user -> !user.isDeleted())
                 .map(accountMapper::toUserResponseDto)
-                .orElseThrow(() -> new RuntimeException("user" + username + " not found"));
+                .orElseThrow(() -> new UserNotFoundException(username));
 
         log.info("check user on findByUserName method. User with username <{}> was found", username);
 
@@ -73,12 +98,12 @@ public class AdminCrudServiceImpl implements AdminCrudService {
 
     @Override
     @Transactional(readOnly = true)
-    public @NonNull UserResponseDto findById(@NonNull Long id) {
+    public @NonNull UserResponseDto getById(@NonNull Long id) {
 
         final UserResponseDto responseDto = jpaUserRepo.findById(id)
                 .filter(user -> !user.isDeleted())
                 .map(accountMapper::toUserResponseDto)
-                .orElseThrow(() -> new RuntimeException("user" + id + " not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         log.info("Check user on findById method. User with id <{}> was found", id);
 
@@ -118,6 +143,7 @@ public class AdminCrudServiceImpl implements AdminCrudService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull Long id) {
 
         if (id.equals(PROTECTED_USER_ID)) {

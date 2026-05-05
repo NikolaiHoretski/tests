@@ -65,4 +65,9 @@ public class ClientCrudServiceImpl implements ClientCrudService {
                 updatedUser.getUsername());
     }
 
+    @Override
+    public void delete(@NonNull Long id) {
+
+    }
+
 }

@@ -43,7 +43,7 @@ class ClientCrudServiceImplIT {
 
         final String username = "admin";
 
-        final UserResponseDto actualResult = adminCrudService.findByUsername(username);
+        final UserResponseDto actualResult = adminCrudService.getByUsername(username);
 
         assertNotNull(actualResult);
         assertEquals(username, actualResult.username());
@@ -56,7 +56,7 @@ class ClientCrudServiceImplIT {
 
         final Long userId = 1L;
 
-        final UserResponseDto actualResult = adminCrudService.findById(userId);
+        final UserResponseDto actualResult = adminCrudService.getById(userId);
 
         assertNotNull(actualResult);
         assertEquals(userId, actualResult.id());

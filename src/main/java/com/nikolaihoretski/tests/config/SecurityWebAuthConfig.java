@@ -1,6 +1,6 @@
 package com.nikolaihoretski.tests.config;
 
-import com.nikolaihoretski.tests.dto.RoleAccess;
+import com.nikolaihoretski.tests.model.RoleAccess;
 import com.nikolaihoretski.tests.filter.jwt.JwtFilter;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;

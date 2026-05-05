@@ -7,12 +7,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface JpaUserRepo extends JpaRepository<User, Long> {
+
+    @NonNull
+    List<User> findAllByIsEnabledAndIsDeletedFalse(boolean isEnabled, boolean isDeleted);
+
+    @NonNull
+    List<User> findAllByIsEnabled(boolean isEnabled);
+
+    @NonNull
+    List<User> findAllByIsDeleted(boolean isDeleted);
 
     @EntityGraph(attributePaths = {
             "userRoles.role",
@@ -34,7 +43,6 @@ public interface JpaUserRepo extends JpaRepository<User, Long> {
 
     @Override
     @Modifying
-    @Transactional
     @Query("update User u set u.isEnabled = false, u.isDeleted = true where u.id = :id")
     void deleteById(@NonNull Long id);
 
