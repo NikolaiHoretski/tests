@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -19,7 +20,7 @@ import java.io.Serial;
         @UniqueConstraint(name = "uk_role_permission", columnNames = {
                 "user_id", "permission_id"
         })})
-public class UserPermission extends BaseEntity<Long> {
+public class UserPermission extends BaseEntity<UUID> {
 
     @Serial
     private static final long serialVersionUID = 1L;

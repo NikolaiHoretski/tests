@@ -1,14 +1,12 @@
 package com.nikolaihoretski.tests.dto;
 
 import java.util.Set;
-import java.util.UUID;
 
-public record UserResponseDto(
-        UUID id,
+public record UserCreateForAdminRequestDto(
         String username,
         String name,
+        String password,
         String email,
-        Boolean isEnabled,
         Set<String> roles,
         Set<String> permissions
 ) {

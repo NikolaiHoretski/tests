@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serial;
+import java.util.UUID;
 
 @Entity
 @Table(name = "permissions")
@@ -12,7 +13,7 @@ import java.io.Serial;
 @Getter
 @Setter
 @Builder
-public class Permission extends BaseEntity<Long> {
+public class Permission extends BaseEntity<UUID> {
 
     @Serial
     private static final long serialVersionUID = 1L;

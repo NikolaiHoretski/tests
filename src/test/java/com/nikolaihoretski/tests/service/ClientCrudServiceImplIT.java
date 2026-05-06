@@ -1,8 +1,8 @@
 package com.nikolaihoretski.tests.service;
 
-import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
+import com.nikolaihoretski.tests.dto.UserCreateForAdminRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
-import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
+import com.nikolaihoretski.tests.dto.UserCreateResponseDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
 import com.nikolaihoretski.tests.model.User;
@@ -19,6 +19,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,7 +55,7 @@ class ClientCrudServiceImplIT {
     @Test
     void shouldReturnFindUserDtoByIdWhenUserExists() {
 
-        final Long userId = 1L;
+        final UUID userId = UUID.randomUUID();
 
         final UserResponseDto actualResult = adminCrudService.getById(userId);
 
@@ -68,7 +69,7 @@ class ClientCrudServiceImplIT {
     @Test
     void create_ForAdmin_shouldSaveUser_WhenRequestIsValid() {
 
-        UserCreateRequestDto createRequestDto = new UserCreateRequestDto(
+        UserCreateForAdminRequestDto createRequestDto = new UserCreateForAdminRequestDto(
                 "my_user",
                 "my_user",
                 "my_user",
@@ -77,10 +78,9 @@ class ClientCrudServiceImplIT {
                 Set.of("WRITE")
         );
 
-        UserResponseWithIdUsernameDto actualResult = adminCrudService.createForAdmin(createRequestDto);
+        boolean actualResult = adminCrudService.createForAdmin(createRequestDto);
 
-        assertNotNull(actualResult);
-        assertEquals(createRequestDto.username(), actualResult.username());
+        assertTrue(actualResult);
 
         assertTrue(jpaUserRepo.existsByUsername(createRequestDto.username()));
     }
@@ -96,7 +96,7 @@ class ClientCrudServiceImplIT {
 
         jpaUserRepo.save(existingUser);
 
-        UserCreateRequestDto actualResult = new UserCreateRequestDto(
+        UserCreateForAdminRequestDto actualResult = new UserCreateForAdminRequestDto(
                 "admin123",
                 "admin",
                 "admin123",
@@ -112,7 +112,8 @@ class ClientCrudServiceImplIT {
     void update_shouldUpdateUser_WhenRequestIsValid() {
 
         User existingUser = new User();
-        existingUser.setId(1L);
+        UUID userid = UUID.randomUUID();
+        existingUser.setId(userid);
         existingUser.setUsername("me");
         existingUser.setPassword("me");
         existingUser.setEmail("me@me.by");
@@ -121,15 +122,15 @@ class ClientCrudServiceImplIT {
         jpaUserRepo.save(existingUser);
 
         UserUpdateRequestDto createRequestDto = new UserUpdateRequestDto(
-                1L,
+                userid,
                 "me",
                 "not_me",
                 null
         );
 
-        UserResponseWithIdUsernameDto actualResult = clientCrudService.update(createRequestDto);
+        boolean actualResult = clientCrudService.update(createRequestDto);
 
-        assertNotNull(actualResult);
+        assertTrue(actualResult);
     }
 
 }

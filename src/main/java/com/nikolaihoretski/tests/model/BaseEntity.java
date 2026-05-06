@@ -3,6 +3,7 @@ package com.nikolaihoretski.tests.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,8 +21,8 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity<U extends Serializable> implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
@@ -31,11 +33,11 @@ public abstract class BaseEntity<U extends Serializable> implements Serializable
     private LocalDateTime updatedAt;
 
     @CreatedBy
-    @JoinColumn(name = "created_by", updatable = false)
+    @Column(name = "created_by", updatable = false)
     private U createdBy;
 
     @LastModifiedBy
-    @JoinColumn(name = "updated_by")
+    @Column(name = "updated_by")
     private U updatedBy;
 
 }

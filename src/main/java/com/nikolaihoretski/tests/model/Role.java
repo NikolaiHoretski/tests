@@ -6,6 +6,7 @@ import lombok.*;
 import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "roles")
@@ -14,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class Role extends BaseEntity<Long> {
+public class Role extends BaseEntity<UUID> {
 
     @Serial
     private static final long serialVersionUID = 1L;

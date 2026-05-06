@@ -10,3 +10,6 @@ databaseChangeLog:
             path: task-2.sql
             relativeToChangelogFile: true
             encoding: utf-8
+            splitStatements: false
+            stripComments: false
+            endDelimiter: "$$"

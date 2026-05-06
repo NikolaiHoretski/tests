@@ -1,6 +1,7 @@
 package com.nikolaihoretski.tests.mapper;
 
 import com.nikolaihoretski.tests.dto.DeleteUserResponseDto;
+import com.nikolaihoretski.tests.dto.UserCreateForAdminRequestDto;
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
 import com.nikolaihoretski.tests.model.User;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 public abstract class AccountMapper {
 
     private static final String DEFAULT_PREFIX = "ROLE_";
+
+    public abstract User toUser(@Nullable UserCreateForAdminRequestDto dto);
 
     public abstract User toUser(@Nullable UserCreateRequestDto dto);
 

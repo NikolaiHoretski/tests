@@ -1,12 +1,15 @@
 package com.nikolaihoretski.tests.model;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -15,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-public class User extends BaseEntity<Long> {
+public class User extends BaseEntity<UUID> {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -40,12 +43,6 @@ public class User extends BaseEntity<Long> {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserRole> userRoles = new HashSet<>();
 
-    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    private Set<UserRole> createUserRoles = new HashSet<>();
-
-    @OneToMany(mappedBy = "updatedBy", fetch = FetchType.LAZY)
-    private Set<UserRole> updateUserRole = new HashSet<>();
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserPermission> userPermissions = new HashSet<>();
 
@@ -55,6 +52,7 @@ public class User extends BaseEntity<Long> {
                 .anyMatch(ur -> ur.getRole().equals(role));
         if (!alreadyHasRole) {
             UserRole userRole = new UserRole();
+            userRole.setId(UuidCreator.getTimeOrderedEpoch());
             userRole.setRole(role);
             userRole.setUser(this);
             this.userRoles.add(userRole);
@@ -66,6 +64,7 @@ public class User extends BaseEntity<Long> {
                 .anyMatch(up -> up.getPermission().equals(permission));
         if (!alreadyHasPermission) {
             UserPermission userPermission = new UserPermission();
+            userPermission.setId(UuidCreator.getTimeOrderedEpoch());
             userPermission.setPermission(permission);
             userPermission.setUser(this);
             this.userPermissions.add(userPermission);

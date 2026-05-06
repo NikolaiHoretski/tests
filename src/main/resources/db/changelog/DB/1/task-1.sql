@@ -1,28 +1,28 @@
 create table roles
 (
-    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id          uuid PRIMARY KEY,
     name        VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(300),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP,
-    created_by  BIGINT,
-    updated_by  BIGINT
+    created_by  uuid,
+    updated_by  uuid
 );
 
 create table permissions
 (
-    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id          uuid PRIMARY KEY,
     name        VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(300),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP,
-    created_by  BIGINT,
-    updated_by  BIGINT
+    created_by  uuid,
+    updated_by  uuid
 );
 
 create table users
 (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id         uuid PRIMARY KEY,
     username   VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     name       VARCHAR(255),
@@ -31,38 +31,38 @@ create table users
     is_deleted bool         NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    created_by BIGINT,
-    updated_by BIGINT
+    created_by uuid,
+    updated_by uuid
 );
 
 create table user_roles
 (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id         uuid PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    created_by BIGINT,
-    updated_by BIGINT,
-    user_id    BIGINT NOT NULL,
-    role_id    BIGINT NOT NULL,
-    constraint fk_user_perm foreign key (user_id) references users (id) on delete cascade,
-    constraint fk_role_perm foreign key (role_id) references roles (id),
-    constraint fk_create_by_perm foreign key (created_by) references users (id) on delete set null,
-    constraint fk_update_by_perm foreign key (updated_by) references users (id) on delete set null,
-    constraint uk_user_role_perm unique (user_id, role_id)
+    created_by uuid,
+    updated_by uuid,
+    user_id    uuid NOT NULL,
+    role_id    uuid NOT NULL,
+    constraint fk_ur_user foreign key (user_id) references users (id) on delete cascade,
+    constraint fk_ur_role foreign key (role_id) references roles (id),
+    constraint fk_ur_create_by foreign key (created_by) references users (id) on delete set null,
+    constraint fk_ur_update_by foreign key (updated_by) references users (id) on delete set null,
+    constraint uk_user_role unique (user_id, role_id)
 );
 
 create table user_permissions
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id            uuid PRIMARY KEY,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP,
-    created_by    BIGINT,
-    updated_by    BIGINT,
-    user_id       BIGINT NOT NULL,
-    permission_id BIGINT NOT NULL,
-    constraint fk_user_perm foreign key (user_id) references users (id),
-    constraint fk_permission_perm foreign key (permission_id) references permissions (id),
-    constraint fk_create_by_perm foreign key (created_by) references users (id) on delete set null,
-    constraint fk_update_by_perm foreign key (updated_by) references users (id) on delete set null,
-    constraint uk_user_permission_perm unique (user_id, permission_id)
+    created_by    uuid,
+    updated_by    uuid,
+    user_id       uuid NOT NULL,
+    permission_id uuid NOT NULL,
+    constraint fk_up_user foreign key (user_id) references users (id),
+    constraint fk_up_permission foreign key (permission_id) references permissions (id),
+    constraint fk_up_create_by foreign key (created_by) references users (id) on delete set null,
+    constraint fk_up_update_by foreign key (updated_by) references users (id) on delete set null,
+    constraint uk_user_permission unique (user_id, permission_id)
 );

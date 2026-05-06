@@ -1,39 +1,98 @@
 package com.nikolaihoretski.tests.service.client;
 
-import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
+import com.github.f4b6a3.uuid.UuidCreator;
+import com.nikolaihoretski.tests.dto.AuthResult;
+import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
-import com.nikolaihoretski.tests.exception.UserNotAuthenticationException;
+import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
+import com.nikolaihoretski.tests.exception.UserIsNotAuthenticationException;
 import com.nikolaihoretski.tests.exception.UserNotFoundException;
-import com.nikolaihoretski.tests.model.User;
+import com.nikolaihoretski.tests.mapper.AccountMapper;
+import com.nikolaihoretski.tests.model.*;
+import com.nikolaihoretski.tests.repo.JpaPermissionRepo;
+import com.nikolaihoretski.tests.repo.JpaRoleRepo;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
+import com.nikolaihoretski.tests.service.jwt.JwtGeneratedFactoryService;
 import com.nikolaihoretski.tests.service.secutity.CustomUserDetails;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Service
 public class ClientCrudServiceImpl implements ClientCrudService {
 
     private final JpaUserRepo jpaUserRepo;
+    private final JpaRoleRepo jpaRoleRepo;
+    private final JpaPermissionRepo jpaPermissionRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtGeneratedFactoryService jwtGeneratedFactoryService;
 
     private static final String DEFAULT_UPDATE_LOG_CONSTRAINT =
             "user field <{}> in user with id <{}> and username <{}> was updated to field <{}>";
+    private final AccountMapper accountMapper;
 
-    public ClientCrudServiceImpl(JpaUserRepo jpaUserRepo) {
+    public ClientCrudServiceImpl(JpaUserRepo jpaUserRepo, JpaRoleRepo jpaRoleRepo, JpaPermissionRepo jpaPermissionRepo, PasswordEncoder passwordEncoder, JwtGeneratedFactoryService jwtGeneratedFactoryService, AccountMapper accountMapper) {
         this.jpaUserRepo = jpaUserRepo;
+        this.jpaRoleRepo = jpaRoleRepo;
+        this.jpaPermissionRepo = jpaPermissionRepo;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtGeneratedFactoryService = jwtGeneratedFactoryService;
+        this.accountMapper = accountMapper;
     }
 
     @Override
     @Transactional
-    public @NonNull UserResponseWithIdUsernameDto update(@NonNull UserUpdateRequestDto updateRequestDto) {
+    public @NonNull AuthResult create(@NonNull UserCreateRequestDto createRequestDto) {
+
+        if (jpaUserRepo.existsByUsername(createRequestDto.username())) {
+            log.info("Check exists of user in create method. User with username <{}> exists",
+                    createRequestDto.username());
+            throw new UserAlreadyExistException(createRequestDto.username());
+        }
+
+        final User user = accountMapper.toUser(createRequestDto);
+        final UUID uuid = UuidCreator.getTimeOrderedEpoch();
+        user.setId(uuid);
+        user.setPassword(passwordEncoder.encode(createRequestDto.password()));
+        user.setEnabled(true);
+        user.setDeleted(false);
+        user.setCreatedBy(uuid);
+
+        final Set<Role> currentRole = jpaRoleRepo.findAllByNameIn(Set.of(RoleAccess.USER.name()));
+        final Set<Permission> currentPermission = jpaPermissionRepo.findAllByNameIn(Set.of(PermissionAccess.READ.name()));
+
+        currentRole.forEach(user::addRole);
+        currentPermission.forEach(user::addPermission);
+
+        jpaUserRepo.save(user);
+
+        log.info("User with username <{}>, and id <{}> was saved", user.getUsername(), user.getId());
+
+        final String createAccessToken = jwtGeneratedFactoryService.createAccessToken(uuid);
+        final String createRefreshToken = jwtGeneratedFactoryService.createRefreshToken(uuid);
+
+        return new AuthResult(
+                user.getId(),
+                user.getUsername(),
+                createAccessToken,
+                createRefreshToken
+        );
+    }
+
+    @Override
+    @Transactional
+    public boolean update(@NonNull UserUpdateRequestDto updateRequestDto) {
 
         final User user = jpaUserRepo.findById(updateRequestDto.id())
                 .orElseThrow(() -> new UserNotFoundException(updateRequestDto.id()));
@@ -64,31 +123,32 @@ public class ClientCrudServiceImpl implements ClientCrudService {
                     email, user.getId(), user.getUsername(), user.getEmail());
         }
 
-        final User updatedUser = jpaUserRepo.save(user);
+        jpaUserRepo.save(user);
 
-        return new UserResponseWithIdUsernameDto(
-                updatedUser.getId(),
-                updatedUser.getUsername());
+        return true;
     }
 
     @Override
+    @Transactional
     public void delete() {
 
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(authentication == null || !authentication.isAuthenticated()){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UserIsNotAuthenticationException();
         }
 
         final Object principle = authentication.getPrincipal();
 
-        if(!(principle instanceof CustomUserDetails details)) {
+        if (!(principle instanceof CustomUserDetails details)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        final Long id = details.getId();
+        final UUID id = details.getId();
 
         jpaUserRepo.deleteById(id);
+
+        SecurityContextHolder.clearContext();
 
         log.info("user with id {}, was deleted", id);
     }

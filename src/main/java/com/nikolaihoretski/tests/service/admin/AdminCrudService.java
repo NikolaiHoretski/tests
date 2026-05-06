@@ -1,13 +1,14 @@
 package com.nikolaihoretski.tests.service.admin;
 
 import com.nikolaihoretski.tests.dto.DeleteUserResponseDto;
-import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
+import com.nikolaihoretski.tests.dto.UserCreateForAdminRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
-import com.nikolaihoretski.tests.dto.UserResponseWithIdUsernameDto;
+import com.nikolaihoretski.tests.dto.UserCreateResponseDto;
 import lombok.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AdminCrudService {
 
@@ -24,11 +25,10 @@ public interface AdminCrudService {
     UserResponseDto getByUsername(@NonNull String username);
 
     @NonNull
-    UserResponseDto getById(@NonNull Long id);
+    UserResponseDto getById(@NonNull UUID id);
 
-    @NonNull
-    UserResponseWithIdUsernameDto createForAdmin(@NonNull UserCreateRequestDto userDto);
+    boolean createForAdmin(@NonNull UserCreateForAdminRequestDto userDto);
 
-    void delete(@NonNull Long id);
+    void delete(@NonNull UUID id);
 
 }
