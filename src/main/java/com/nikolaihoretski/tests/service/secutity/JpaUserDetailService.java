@@ -1,5 +1,7 @@
 package com.nikolaihoretski.tests.service.secutity;
 
+import com.nikolaihoretski.tests.exception.UserNotFoundException;
+import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import lombok.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,51 +30,34 @@ public class JpaUserDetailService implements UserDetailsService {
     @NonNull
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
-
         return jpaUserRepo.findByUsername(username)
-                .map(user -> {
-                   final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-
-                   user.getUserRoles().forEach(role ->
-                           authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole().getName())));
-
-                   user.getUserPermissions().forEach(permission ->
-                           authorities.add(new SimpleGrantedAuthority(permission.getPermission().getName())));
-
-                    return new CustomUserDetails(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getPassword(),
-                            user.isEnabled(),
-                            authorities
-                    );
-                })
-                .orElseThrow(() -> new UsernameNotFoundException("User with uuid " + username + " not found"));
+                .map(this::mapToUserDetails)
+                .orElseThrow(() -> new UserNotFoundException(username));
     }
 
     @NonNull
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(@NonNull UUID uuid) throws UsernameNotFoundException {
-
         return jpaUserRepo.findById(uuid)
-                .map(user -> {
-                    final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                .map(this::mapToUserDetails)
+                .orElseThrow(() -> new UserNotFoundException(uuid));
+    }
 
-                    user.getUserRoles().forEach(role ->
-                            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole().getName())));
+    private CustomUserDetails mapToUserDetails(User user) {
+        final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        user.getUserRoles().forEach(role ->
+                authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole().getName())));
 
-                    user.getUserPermissions().forEach(permission ->
-                            authorities.add(new SimpleGrantedAuthority(permission.getPermission().getName())));
+        user.getUserPermissions().forEach(permission ->
+                authorities.add(new SimpleGrantedAuthority(permission.getPermission().getName())));
 
-                    return new CustomUserDetails(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getPassword(),
-                            user.isEnabled(),
-                            authorities
-                    );
-                })
-                .orElseThrow(() -> new UsernameNotFoundException("User with uuid " + uuid + " not found"));
+        return new CustomUserDetails(
+                user.getId(),
+                user.getUsername(),
+                user.getPassword(),
+                user.isEnabled(),
+                authorities
+        );
     }
 
 }

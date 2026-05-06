@@ -8,7 +8,7 @@ import java.util.UUID;
 public class UserNotFoundException extends ServiceError {
 
     public UserNotFoundException(@NonNull UUID id) {
-    super(ErrorCode.USER_NOT_FOUND.format("id", id),
+    super(ErrorCode.USER_NOT_FOUND.format("uuid", id),
             ErrorCode.USER_NOT_FOUND.getCode(),
             HttpStatus.NOT_FOUND);
     }
