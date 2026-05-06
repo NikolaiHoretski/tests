@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -20,7 +21,7 @@ public class JwtParserService {
     }
 
     @NonNull
-    public String extractUsernameFromToken(@NonNull String token) throws BadCredentialsException {
+    public String extractUuidFromToken(@NonNull String token) throws BadCredentialsException {
 
         if (token.isBlank()) {
             throw new BadCredentialsException("Jwt token is missing");

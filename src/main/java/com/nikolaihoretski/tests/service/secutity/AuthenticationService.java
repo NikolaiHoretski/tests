@@ -1,5 +1,6 @@
 package com.nikolaihoretski.tests.service.secutity;
 
+import com.nikolaihoretski.tests.dto.AuthResult;
 import com.nikolaihoretski.tests.dto.LoginDto;
 import com.nikolaihoretski.tests.dto.TokenResponseDto;
 import com.nikolaihoretski.tests.exception.UserNotFoundException;
@@ -34,7 +35,7 @@ public class AuthenticationService {
     }
 
     @NonNull
-    public TokenResponseDto verify(@NonNull LoginDto loginDto) {
+    public AuthResult verify(@NonNull LoginDto loginDto) {
         try {
             final Authentication authenticationCredentials = new UsernamePasswordAuthenticationToken(
                     loginDto.username(),
@@ -54,7 +55,7 @@ public class AuthenticationService {
         final String accessToken = jwtGeneratedFactoryService.createAccessToken(uuid);
         final String refreshToken = jwtGeneratedFactoryService.createRefreshToken(uuid);
 
-        return new TokenResponseDto(accessToken, refreshToken);
+        return new AuthResult(uuid, user.getUsername(),accessToken, refreshToken);
     }
 
 }

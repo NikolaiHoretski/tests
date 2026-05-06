@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class JpaUserDetailService implements UserDetailsService {
@@ -46,7 +47,32 @@ public class JpaUserDetailService implements UserDetailsService {
                             authorities
                     );
                 })
-                .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User with uuid " + username + " not found"));
+    }
+
+    @NonNull
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(@NonNull UUID uuid) throws UsernameNotFoundException {
+
+        return jpaUserRepo.findById(uuid)
+                .map(user -> {
+                    final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+                    user.getUserRoles().forEach(role ->
+                            authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole().getName())));
+
+                    user.getUserPermissions().forEach(permission ->
+                            authorities.add(new SimpleGrantedAuthority(permission.getPermission().getName())));
+
+                    return new CustomUserDetails(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getPassword(),
+                            user.isEnabled(),
+                            authorities
+                    );
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("User with uuid " + uuid + " not found"));
     }
 
 }

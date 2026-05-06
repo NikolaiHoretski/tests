@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -48,19 +49,19 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         final String token = authHeader.substring(7);
-        final String username = extractUsername(token);
+        final UUID uuid = extractUsername(token);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            authenticateUser(username, request);
+        if (uuid != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            authenticateUser(uuid, request);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private String extractUsername(@NonNull String token) {
+    private UUID extractUsername(@NonNull String token) {
 
         try {
-            return parserService.extractUsernameFromToken(token);
+            return UUID.fromString(parserService.extractUuidFromToken(token));
         } catch (Exception e) {
             log.error("Failed to extract username from token ", e);
         }
@@ -69,17 +70,17 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
-    private void authenticateUser(@NonNull String username, @NonNull HttpServletRequest request) {
+    private void authenticateUser(@NonNull UUID uuid, @NonNull HttpServletRequest request) {
 
         try {
-            final UserDetails userDetails = userDetailService.loadUserByUsername(username);
+            final UserDetails userDetails = userDetailService.loadUserByUsername(uuid);
             final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
             );
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         } catch (UsernameNotFoundException e) {
-            log.warn("User with name: {} not found", username);
+            log.warn("User with name: {} not found", uuid);
         }
     }
 

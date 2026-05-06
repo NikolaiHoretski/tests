@@ -30,7 +30,7 @@ public class CreateMeController {
         final Cookie cookie = new Cookie("refreshToken", result.refreshToken());
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
-        cookie.setPath("/api/auth/regresh");
+        cookie.setPath("/");
         response.addCookie(cookie);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
