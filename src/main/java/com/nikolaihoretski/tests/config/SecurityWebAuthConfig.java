@@ -44,6 +44,7 @@ public class SecurityWebAuthConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/login",
+                                "/api/refresh",
                                 "/api/register/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -64,6 +65,7 @@ public class SecurityWebAuthConfig {
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:5175"

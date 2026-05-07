@@ -51,7 +51,7 @@ public interface JpaUserRepo extends JpaRepository<User, UUID> {
     void deleteById(@NonNull UUID id);
 
     @NonNull
-    @Query("select u.id from User u JOIN u.userRoles ur where ur.role = :role")
+    @Query("select u.id from User u JOIN u.userRoles ur where ur.role.name = :role")
     List<UUID> findAllByRole(@NonNull String role);
 
 }

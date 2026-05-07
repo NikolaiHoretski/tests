@@ -13,7 +13,8 @@ $$
                 false,
                 admin_id);
         INSERT INTO roles (id, name, description, created_by)
-        VALUES (uuidv7(), 'ADMIN', 'admin', admin_id),
+        VALUES (uuidv7(), 'SUPERADMIN', 'superadmin', admin_id),
+               (uuidv7(), 'ADMIN', 'admin', admin_id),
                (uuidv7(), 'USER', 'user', admin_id),
                (uuidv7(), 'MANAGER', 'manager', admin_id),
                (uuidv7(), 'PROMOTER', 'promoter', admin_id),
@@ -29,7 +30,9 @@ $$
         VALUES (uuidv7(), (SELECT id FROM users WHERE username = 'admin'), (SELECT id FROM roles WHERE name = 'ADMIN'),
                 (SELECT id FROM users WHERE username = 'admin')),
                (uuidv7(), (SELECT id FROM users WHERE username = 'admin'), (SELECT id FROM roles WHERE name = 'USER'),
-                (SELECT id FROM users WHERE username = 'admin'));
+                (SELECT id FROM users WHERE username = 'admin')),
+               (uuidv7(), (SELECT id FROM users WHERE username = 'admin'), (SELECT  id FROM roles WHERE name = 'SUPERADMIN'),
+                (SELECT  id from users WHERE username = 'superadmin'));
 
 
         INSERT INTO user_permissions(id, user_id, permission_id, created_by)

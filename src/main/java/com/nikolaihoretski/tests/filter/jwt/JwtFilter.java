@@ -2,6 +2,7 @@ package com.nikolaihoretski.tests.filter.jwt;
 
 import com.nikolaihoretski.tests.service.jwt.JwtParserService;
 import com.nikolaihoretski.tests.service.secutity.JpaUserDetailService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +42,12 @@ public class JwtFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
+        final String path = request.getServletPath();
+        if(path.equals("/api/login") || path.equals("/api/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader(AUTHORIZATION_HEADER);
 
         if (Objects.isNull(authHeader) || !authHeader.startsWith(BEARER_PREFIX)) {
@@ -49,29 +56,29 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         final String token = authHeader.substring(7);
-        final UUID uuid = extractUsername(token);
 
-        if (uuid != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            authenticateUser(uuid, request);
+        try {
+            final UUID uuid = extractUsername(token);
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                authenticateUser(uuid, request);
+            }
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            log.warn("Token expired: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token expired\"}");
+        } catch (Exception e) {
+            log.error("Auth error: ", e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private UUID extractUsername(@NonNull String token) {
-
-        try {
             return UUID.fromString(parserService.extractUuidFromToken(token));
-        } catch (Exception e) {
-            log.error("Failed to extract username from token ", e);
-        }
-
-        return null;
     }
 
-
     private void authenticateUser(@NonNull UUID uuid, @NonNull HttpServletRequest request) {
-
         try {
             final UserDetails userDetails = userDetailService.loadUserByUsername(uuid);
             final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

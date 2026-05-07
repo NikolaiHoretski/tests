@@ -34,7 +34,7 @@ public class JwtGeneratedFactoryService {
     }
 
     public @Nullable String createAccessToken(@NonNull UUID uuid) {
-        return createToken(uuid, 1000 * 60 * 10);
+        return createToken(uuid, 1000L * 60 * 10);
     }
 
     public @Nullable String createRefreshToken(@NonNull UUID uuid) {

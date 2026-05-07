@@ -140,6 +140,8 @@ public class AdminCrudServiceImpl implements AdminCrudService {
     @Override
     @Transactional
     public void delete(@NonNull UUID id) {
+//
+//        if()
 
         final List<UUID> uuids = jpaUserRepo.findAllByRole(RoleAccess.ADMIN.name());
 

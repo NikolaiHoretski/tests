@@ -2,9 +2,8 @@ package com.nikolaihoretski.tests.dto;
 
 import java.util.UUID;
 
-public record UserLoginResponseDto (
+public record UserAuthRefreshResponseDto(
         UUID id,
-        String username,
         String accessToken
 ) {
 }

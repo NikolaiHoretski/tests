@@ -3,7 +3,6 @@ package com.nikolaihoretski.tests.controller;
 import com.nikolaihoretski.tests.dto.DeleteUserResponseDto;
 import com.nikolaihoretski.tests.dto.UserCreateForAdminRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
-import com.nikolaihoretski.tests.dto.UserCreateResponseDto;
 import com.nikolaihoretski.tests.service.admin.AdminCrudService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ public class AdminController {
         this.adminCrudService = adminCrudService;
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/getAllValidUsers")
     @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.model.RoleAccess).ADMIN.name())")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         return ResponseEntity.ok(adminCrudService.getAll());

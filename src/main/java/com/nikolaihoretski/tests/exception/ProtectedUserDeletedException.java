@@ -8,7 +8,7 @@ import java.util.UUID;
 public class ProtectedUserDeletedException extends ServiceError{
 
     public ProtectedUserDeletedException(@NotNull UUID id) {
-        super(ErrorCode.USER_NOT_FOUND.format("id", id),
+        super(ErrorCode.USER_PROTECTED.format("id", id),
                 ErrorCode.USER_PROTECTED.getCode(),
                 HttpStatus.CONFLICT);
     }
