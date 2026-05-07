@@ -1,6 +1,5 @@
 package com.nikolaihoretski.tests.controller;
 
-import com.nikolaihoretski.tests.dto.UserCreateResponseDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.service.client.ClientCrudService;
 import org.springframework.http.ResponseEntity;

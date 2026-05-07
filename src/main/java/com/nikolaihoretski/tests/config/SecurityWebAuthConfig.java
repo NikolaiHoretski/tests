@@ -53,6 +53,7 @@ public class SecurityWebAuthConfig {
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole(RoleAccess.ADMIN.name())
                         .requestMatchers("/api/user/**").hasRole(RoleAccess.USER.name())
+                        .requestMatchers("/api/getPrivileges").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(
                         session -> session

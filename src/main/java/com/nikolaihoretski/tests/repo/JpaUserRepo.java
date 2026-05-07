@@ -1,7 +1,5 @@
 package com.nikolaihoretski.tests.repo;
 
-import com.nikolaihoretski.tests.model.Role;
-import com.nikolaihoretski.tests.model.RoleAccess;
 import com.nikolaihoretski.tests.model.User;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -57,5 +56,13 @@ public interface JpaUserRepo extends JpaRepository<User, UUID> {
 
     @Query("select count(u) > 0 from User u JOIN u.userRoles ur where u.id = :uuid and ur.role.name = :roleName")
     boolean existsByIdAndRole(@NonNull UUID uuid, @NonNull String roleName);
+
+    @NonNull
+    @Query("""
+            select concat('ROLE_', ur.role.name) from User u JOIN u.userRoles ur where u.id = :uuid
+            UNION
+            select rp.permission.name from User u JOIN u.userPermissions rp where u.id = :uuid
+            """)
+    Set<String> findPrivilegesByUserId(@NonNull UUID uuid);
 
 }
