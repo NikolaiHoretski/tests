@@ -53,7 +53,7 @@ public class AdminController {
         return adminCrudService.getById(id);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/createNewUser")
     @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.model.RoleAccess).ADMIN.name())")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Boolean> create(@RequestBody UserCreateForAdminRequestDto dto) {
@@ -61,7 +61,7 @@ public class AdminController {
         return Map.of("success", isCrated);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/deleteUser/{id}")
     @PreAuthorize("hasRole(T(com.nikolaihoretski.tests.model.RoleAccess).ADMIN.name())")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         adminCrudService.delete(id);

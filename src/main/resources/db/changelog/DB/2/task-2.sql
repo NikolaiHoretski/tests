@@ -27,13 +27,9 @@ $$
                (uuidv7(), 'CREATE', 'createForAdmin data', admin_id);
 
         INSERT INTO user_roles(id, user_id, role_id, created_by)
-        VALUES (uuidv7(), (SELECT id FROM users WHERE username = 'admin'), (SELECT id FROM roles WHERE name = 'ADMIN'),
-                (SELECT id FROM users WHERE username = 'admin')),
-               (uuidv7(), (SELECT id FROM users WHERE username = 'admin'), (SELECT id FROM roles WHERE name = 'USER'),
-                (SELECT id FROM users WHERE username = 'admin')),
-               (uuidv7(), (SELECT id FROM users WHERE username = 'admin'), (SELECT  id FROM roles WHERE name = 'SUPERADMIN'),
-                (SELECT  id from users WHERE username = 'superadmin'));
-
+        VALUES (uuidv7(), admin_id, (SELECT id FROM roles WHERE name = 'ADMIN'),admin_id),
+               (uuidv7(), admin_id, (SELECT id FROM roles WHERE name = 'USER'), admin_id),
+               (uuidv7(), admin_id, (SELECT  id FROM roles WHERE name = 'SUPERADMIN'), admin_id);
 
         INSERT INTO user_permissions(id, user_id, permission_id, created_by)
         VALUES (uuidv7(),

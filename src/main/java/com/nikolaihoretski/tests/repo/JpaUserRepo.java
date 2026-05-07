@@ -1,6 +1,7 @@
 package com.nikolaihoretski.tests.repo;
 
 import com.nikolaihoretski.tests.model.Role;
+import com.nikolaihoretski.tests.model.RoleAccess;
 import com.nikolaihoretski.tests.model.User;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -53,5 +54,8 @@ public interface JpaUserRepo extends JpaRepository<User, UUID> {
     @NonNull
     @Query("select u.id from User u JOIN u.userRoles ur where ur.role.name = :role")
     List<UUID> findAllByRole(@NonNull String role);
+
+    @Query("select count(u) > 0 from User u JOIN u.userRoles ur where u.id = :uuid and ur.role.name = :roleName")
+    boolean existsByIdAndRole(@NonNull UUID uuid, @NonNull String roleName);
 
 }

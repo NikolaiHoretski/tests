@@ -3,7 +3,6 @@ package com.nikolaihoretski.tests.service.admin;
 import com.nikolaihoretski.tests.dto.DeleteUserResponseDto;
 import com.nikolaihoretski.tests.dto.UserCreateForAdminRequestDto;
 import com.nikolaihoretski.tests.dto.UserResponseDto;
-import com.nikolaihoretski.tests.dto.UserCreateResponseDto;
 import lombok.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -22,13 +21,13 @@ public interface AdminCrudService {
     List<UserResponseDto> getAllDisableUsers();
 
     @NonNull
-    UserResponseDto getByUsername(@NonNull String username);
+    UserResponseDto getByUsername(@NonNull String targetUsername);
 
     @NonNull
-    UserResponseDto getById(@NonNull UUID id);
+    UserResponseDto getById(@NonNull UUID targetUuid);
 
     boolean createForAdmin(@NonNull UserCreateForAdminRequestDto userDto);
 
-    void delete(@NonNull UUID id);
+    void delete(@NonNull UUID targetUuid);
 
 }

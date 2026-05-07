@@ -46,8 +46,7 @@ public class User extends BaseEntity<UUID> {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserPermission> userPermissions = new HashSet<>();
 
-
-    public void addRole(Role role) {
+    public void addRole(@NonNull Role role) {
         boolean alreadyHasRole = this.userRoles.stream()
                 .anyMatch(ur -> ur.getRole().equals(role));
         if (!alreadyHasRole) {
@@ -59,7 +58,7 @@ public class User extends BaseEntity<UUID> {
         }
     }
 
-    public void addPermission(Permission permission) {
+    public void addPermission(@NonNull Permission permission) {
         boolean alreadyHasPermission = this.userPermissions.stream()
                 .anyMatch(up -> up.getPermission().equals(permission));
         if (!alreadyHasPermission) {
@@ -69,6 +68,16 @@ public class User extends BaseEntity<UUID> {
             userPermission.setUser(this);
             this.userPermissions.add(userPermission);
         }
+    }
+
+    public boolean hasRole(@NonNull String roleName) {
+        return userRoles.stream()
+                .anyMatch(userRole -> roleName.equalsIgnoreCase(userRole.getRole().getName()));
+    }
+
+    public boolean hasPermission(@NonNull String permission) {
+        return userPermissions.stream()
+                .anyMatch(userPermission -> permission.equalsIgnoreCase(userPermission.getPermission().getName()));
     }
 
 }

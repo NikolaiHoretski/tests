@@ -15,6 +15,7 @@ import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.JpaPermissionRepo;
 import com.nikolaihoretski.tests.repo.JpaRoleRepo;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
+import com.nikolaihoretski.tests.validation.SecurtyValidationCheckAuthUserUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -79,28 +80,28 @@ public class AdminCrudServiceImpl implements AdminCrudService {
 
     @Override
     @Transactional(readOnly = true)
-    public @NonNull UserResponseDto getByUsername(@NonNull String username) {
+    public @NonNull UserResponseDto getByUsername(@NonNull String targetUsername) {
 
-        final UserResponseDto responseDto = jpaUserRepo.findByUsername(username)
+        final UserResponseDto responseDto = jpaUserRepo.findByUsername(targetUsername)
                 .filter(user -> !user.isDeleted())
                 .map(accountMapper::toUserResponseDto)
-                .orElseThrow(() -> new UserNotFoundException(username));
+                .orElseThrow(() -> new UserNotFoundException(targetUsername));
 
-        log.info("check user on findByUserName method. User with username <{}> was found", username);
+        log.info("check user on findByUserName method. User with targetUsername <{}> was found", targetUsername);
 
         return responseDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public @NonNull UserResponseDto getById(@NonNull UUID id) {
+    public @NonNull UserResponseDto getById(@NonNull UUID targetUuid) {
 
-        final UserResponseDto responseDto = jpaUserRepo.findById(id)
+        final UserResponseDto responseDto = jpaUserRepo.findById(targetUuid)
                 .filter(user -> !user.isDeleted())
                 .map(accountMapper::toUserResponseDto)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException(targetUuid));
 
-        log.info("Check user on findById method. User with id <{}> was found", id);
+        log.info("Check user on findById method. User with targetUuid <{}> was found", targetUuid);
 
         return responseDto;
     }
@@ -130,7 +131,7 @@ public class AdminCrudServiceImpl implements AdminCrudService {
         currentRole.forEach(user::addRole);
         currentPermissions.forEach(user::addPermission);
 
-       jpaUserRepo.save(user);
+        jpaUserRepo.save(user);
 
         log.info("User with username <{}>, and id <{}> was saved", user.getUsername(), user.getId());
 
@@ -139,25 +140,28 @@ public class AdminCrudServiceImpl implements AdminCrudService {
 
     @Override
     @Transactional
-    public void delete(@NonNull UUID id) {
-//
-//        if()
+    public void delete(@NonNull UUID targetUuid) {
 
-        final List<UUID> uuids = jpaUserRepo.findAllByRole(RoleAccess.ADMIN.name());
+        final UUID currentUserUuid = SecurtyValidationCheckAuthUserUtils.currentUserCheckIsValidAndReturnId();
 
-        for(UUID uuid : uuids) {
-            if (id.equals(uuid)) {
-                throw new ProtectedUserDeletedException(id);
-            }
+        final User currentUser = jpaUserRepo.findById(currentUserUuid).orElseThrow(
+                () -> new UserNotFoundException(currentUserUuid));
+
+        if (!jpaUserRepo.existsById(targetUuid)) {
+            throw new UserNotFoundException(targetUuid);
         }
 
-        if (!jpaUserRepo.existsById(id)) {
-            throw new UserNotFoundException(id);
+        if(!currentUser.hasRole(RoleAccess.SUPERADMIN.name()) && isTargetAdmin(targetUuid)) {
+            throw new ProtectedUserDeletedException(targetUuid);
         }
 
-        jpaUserRepo.deleteById(id);
+        jpaUserRepo.deleteById(targetUuid);
 
-        log.info("User with id {} was deleted", id);
+        log.info("User with targetUuid {} was deleted by user with uuid: {}", targetUuid, currentUserUuid);
+    }
+
+    private boolean isTargetAdmin(@NonNull UUID targetUuid) {
+        return jpaUserRepo.existsByIdAndRole(targetUuid, RoleAccess.ADMIN.name());
     }
 
 }

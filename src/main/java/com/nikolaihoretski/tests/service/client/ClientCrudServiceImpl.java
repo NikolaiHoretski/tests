@@ -5,7 +5,6 @@ import com.nikolaihoretski.tests.dto.AuthResult;
 import com.nikolaihoretski.tests.dto.UserCreateRequestDto;
 import com.nikolaihoretski.tests.dto.UserUpdateRequestDto;
 import com.nikolaihoretski.tests.exception.UserAlreadyExistException;
-import com.nikolaihoretski.tests.exception.UserIsNotAuthenticationException;
 import com.nikolaihoretski.tests.exception.UserNotFoundException;
 import com.nikolaihoretski.tests.mapper.AccountMapper;
 import com.nikolaihoretski.tests.model.*;
@@ -14,10 +13,10 @@ import com.nikolaihoretski.tests.repo.JpaRoleRepo;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import com.nikolaihoretski.tests.service.jwt.JwtGeneratedFactoryService;
 import com.nikolaihoretski.tests.service.secutity.CustomUserDetails;
+import com.nikolaihoretski.tests.validation.SecurtyValidationCheckAuthUserUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -132,19 +131,7 @@ public class ClientCrudServiceImpl implements ClientCrudService {
     @Transactional
     public void delete() {
 
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new UserIsNotAuthenticationException();
-        }
-
-        final Object principle = authentication.getPrincipal();
-
-        if (!(principle instanceof CustomUserDetails details)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        final UUID id = details.getId();
+        final UUID id = SecurtyValidationCheckAuthUserUtils.currentUserCheckIsValidAndReturnId();
 
         jpaUserRepo.deleteById(id);
 

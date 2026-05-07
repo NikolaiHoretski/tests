@@ -50,9 +50,9 @@ public class AuthMeController {
         final ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)
                 .secure(false)
-                .path("/")
+                .path("/api/refresh")
                 .maxAge(Duration.ofDays(30))
-                .sameSite("Lax")
+                .sameSite("Strict")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
