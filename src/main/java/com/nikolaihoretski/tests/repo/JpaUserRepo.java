@@ -44,12 +44,6 @@ public interface JpaUserRepo extends JpaRepository<User, UUID> {
 
     boolean existsByUsername(@NonNull String username);
 
-
-    @Override
-    @Modifying
-    @Query("update User u set u.isEnabled = false, u.isDeleted = true where u.id = :id")
-    void deleteById(@NonNull UUID id);
-
     @NonNull
     @Query("select u.id from User u JOIN u.userRoles ur where ur.role.name = :role")
     List<UUID> findAllByRole(@NonNull String role);

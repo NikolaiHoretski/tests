@@ -2,6 +2,7 @@ package com.nikolaihoretski.tests.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.io.Serial;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "roles")
+@BatchSize(size = 20)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -138,6 +138,7 @@ public class AdminCrudServiceImpl implements AdminCrudService {
         return true;
     }
 
+    //soft delete
     @Override
     @Transactional
     public void delete(@NonNull UUID targetUuid) {
@@ -147,21 +148,24 @@ public class AdminCrudServiceImpl implements AdminCrudService {
         final User currentUser = jpaUserRepo.findById(currentUserUuid).orElseThrow(
                 () -> new UserNotFoundException(currentUserUuid));
 
-        if (!jpaUserRepo.existsById(targetUuid)) {
-            throw new UserNotFoundException(targetUuid);
-        }
+        final User targetUser = jpaUserRepo.findById(targetUuid).orElseThrow(
+                () -> new UserNotFoundException(targetUuid));
 
-        if(!currentUser.hasRole(RoleAccess.SUPERADMIN.name()) && isTargetAdmin(targetUuid)) {
+        if (!currentUser.hasRole(RoleAccess.SUPERADMIN.name())
+                && (targetUser.hasRole(RoleAccess.SUPERADMIN.name())
+                || targetUser.hasRole(RoleAccess.ADMIN.name()))) {
             throw new ProtectedUserDeletedException(targetUuid);
         }
 
-        jpaUserRepo.deleteById(targetUuid);
+        targetUser.getUserRoles().clear();
+        targetUser.getUserPermissions().clear();
+
+        targetUser.setDeleted(true);
+        targetUser.setEnabled(false);
+
+        jpaUserRepo.save(targetUser);
 
         log.info("User with targetUuid {} was deleted by user with uuid: {}", targetUuid, currentUserUuid);
-    }
-
-    private boolean isTargetAdmin(@NonNull UUID targetUuid) {
-        return jpaUserRepo.existsByIdAndRole(targetUuid, RoleAccess.ADMIN.name());
     }
 
 }

@@ -39,26 +39,30 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     @Override
     @NonNull
     public AuthResult verify(@NonNull LoginDto loginDto) {
+
+        final Authentication auth;
         try {
             final Authentication authenticationCredentials = new UsernamePasswordAuthenticationToken(
                     loginDto.username(),
                     loginDto.password()
             );
-            authenticationManager.authenticate(authenticationCredentials);
+            auth = authenticationManager.authenticate(authenticationCredentials);
         } catch (AuthenticationException e) {
             log.error("Error to authenticate for username: {}", loginDto.username());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        final User user = jpaUserRepo.findByUsername(loginDto.username())
-                .orElseThrow(() -> new UserNotFoundException(loginDto.username()));
+        if(auth.getPrincipal() instanceof CustomUserDetails details) {
 
-        final UUID uuid = user.getId();
+            final UUID uuid = details.getId();
+            final String username = details.getUsername();
 
-        final String accessToken = jwtGeneratedFactoryService.createAccessToken(uuid);
-        final String refreshToken = jwtGeneratedFactoryService.createRefreshToken(uuid);
+            final String accessToken = jwtGeneratedFactoryService.createAccessToken(uuid);
+            final String refreshToken = jwtGeneratedFactoryService.createRefreshToken(uuid);
 
-        return new AuthResult(uuid, user.getUsername(),accessToken, refreshToken);
+            return new AuthResult(uuid, username, accessToken, refreshToken);
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     @Override

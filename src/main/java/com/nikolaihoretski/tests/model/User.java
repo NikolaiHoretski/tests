@@ -3,6 +3,7 @@ package com.nikolaihoretski.tests.model;
 import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -40,10 +41,12 @@ public class User extends BaseEntity<UUID> {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     private Set<UserRole> userRoles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     private Set<UserPermission> userPermissions = new HashSet<>();
 
     public void addRole(@NonNull Role role) {

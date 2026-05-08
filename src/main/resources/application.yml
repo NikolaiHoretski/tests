@@ -1,15 +1,11 @@
 spring:
   application:
-    name: study_for_testing
+    name: tests
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-  data:
-    redis:
-      host: localhost
-      port: 6379
   jpa:
     show-sql: true
     properties:
