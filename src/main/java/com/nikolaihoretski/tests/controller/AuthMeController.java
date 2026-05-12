@@ -29,7 +29,7 @@ public class AuthMeController {
         final AuthResult result = authenticationServiceImpl.verify(loginDto);
         setCookie(response, result.refreshToken());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
+        return ResponseEntity.ok().body(
                 new UserAuthLoginResponseDto(result.id(), result.username(), result.accessToken())
         );
     }

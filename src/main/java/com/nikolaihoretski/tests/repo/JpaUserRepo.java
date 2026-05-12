@@ -4,7 +4,6 @@ import com.nikolaihoretski.tests.model.User;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +18,7 @@ public interface JpaUserRepo extends JpaRepository<User, UUID> {
     boolean existsById(@NonNull UUID id);
 
     @NonNull
-    List<User> findAllByIsEnabledAndIsDeletedFalse(boolean isEnabled, boolean isDeleted);
+    List<User> findAllByIsEnabledTrueAndIsDeletedFalse(boolean isEnabled, boolean isDeleted);
 
     @NonNull
     List<User> findAllByIsEnabled(boolean isEnabled);

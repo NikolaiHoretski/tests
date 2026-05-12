@@ -15,10 +15,11 @@ import com.nikolaihoretski.tests.model.User;
 import com.nikolaihoretski.tests.repo.JpaPermissionRepo;
 import com.nikolaihoretski.tests.repo.JpaRoleRepo;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
-import com.nikolaihoretski.tests.validation.SecurtyValidationCheckAuthUserUtils;
+import com.nikolaihoretski.tests.validation.SecurityValidationCheckAuthUserUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public class AdminCrudServiceImpl implements AdminCrudService {
     @Transactional(readOnly = true)
     public @Nullable List<UserResponseDto> getAll() {
 
-        final List<User> users = jpaUserRepo.findAllByIsEnabledAndIsDeletedFalse(true, false);
+        final List<User> users = jpaUserRepo.findAllByIsEnabledTrueAndIsDeletedFalse(true, false);
 
         log.info("find all users: {}", users);
 
@@ -143,7 +144,9 @@ public class AdminCrudServiceImpl implements AdminCrudService {
     @Transactional
     public void delete(@NonNull UUID targetUuid) {
 
-        final UUID currentUserUuid = SecurtyValidationCheckAuthUserUtils.currentUserCheckIsValidAndReturnId();
+        final Authentication authentication = SecurityValidationCheckAuthUserUtils.currentUserCheckIsValidAuth();
+
+        final UUID currentUserUuid = SecurityValidationCheckAuthUserUtils.getCurrentUserId(authentication).getId();
 
         final User currentUser = jpaUserRepo.findById(currentUserUuid).orElseThrow(
                 () -> new UserNotFoundException(currentUserUuid));

@@ -12,16 +12,14 @@ import com.nikolaihoretski.tests.repo.JpaPermissionRepo;
 import com.nikolaihoretski.tests.repo.JpaRoleRepo;
 import com.nikolaihoretski.tests.repo.JpaUserRepo;
 import com.nikolaihoretski.tests.service.jwt.JwtGeneratedFactoryService;
-import com.nikolaihoretski.tests.service.secutity.CustomUserDetails;
-import com.nikolaihoretski.tests.validation.SecurtyValidationCheckAuthUserUtils;
+import com.nikolaihoretski.tests.validation.SecurityValidationCheckAuthUserUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
 import java.util.Set;
@@ -131,7 +129,9 @@ public class ClientCrudServiceImpl implements ClientCrudService {
     @Transactional
     public void delete() {
 
-        final UUID id = SecurtyValidationCheckAuthUserUtils.currentUserCheckIsValidAndReturnId();
+        final Authentication authentication = SecurityValidationCheckAuthUserUtils.currentUserCheckIsValidAuth();
+
+        final UUID id = SecurityValidationCheckAuthUserUtils.getCurrentUserId(authentication).getId();
 
         jpaUserRepo.deleteById(id);
 

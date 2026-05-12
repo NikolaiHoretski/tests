@@ -1,36 +1,35 @@
 package com.nikolaihoretski.tests.service;
 
 import com.nikolaihoretski.tests.dto.UserPrivilegesDto;
-import com.nikolaihoretski.tests.exception.UserNotFoundException;
-import com.nikolaihoretski.tests.repo.JpaUserRepo;
-import com.nikolaihoretski.tests.validation.SecurtyValidationCheckAuthUserUtils;
+import com.nikolaihoretski.tests.validation.SecurityValidationCheckAuthUserUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class PrivilegeServiceImpl implements PrivilegeService{
-
-    private final JpaUserRepo jpaUserRepo;
-
-    public PrivilegeServiceImpl(JpaUserRepo jpaUserRepo) {
-        this.jpaUserRepo = jpaUserRepo;
-    }
+public class PrivilegeServiceImpl implements PrivilegeService {
 
     @Override
     public @NonNull UserPrivilegesDto getUserPrivileges() {
 
-        final UUID uuid = SecurtyValidationCheckAuthUserUtils.currentUserCheckIsValidAndReturnId();
+        final Authentication authentication = SecurityValidationCheckAuthUserUtils.currentUserCheckIsValidAuth();
 
-        if(!jpaUserRepo.existsById(uuid)) {
-            throw new UserNotFoundException(uuid);
-        }
+        final UUID uuid = SecurityValidationCheckAuthUserUtils.getCurrentUserId(authentication).getId();
 
-        final Set<String> listOfPrivileges = jpaUserRepo.findPrivilegesByUserId(uuid);
+        log.info("Getting user privileges from database for uuid: {}", uuid);
+
+        final Set<String> listOfPrivileges =
+                SecurityValidationCheckAuthUserUtils.currentUserCheckIsValidAuth().getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toSet());
 
         log.info("get privilegesList: {}, by user uuid: {}", listOfPrivileges, uuid);
 

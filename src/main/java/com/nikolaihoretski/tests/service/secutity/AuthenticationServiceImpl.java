@@ -47,6 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
                     loginDto.password()
             );
             auth = authenticationManager.authenticate(authenticationCredentials);
+            log.info("Authentication Successful for user with username {}", loginDto.username());
         } catch (AuthenticationException e) {
             log.error("Error to authenticate for username: {}", loginDto.username());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
