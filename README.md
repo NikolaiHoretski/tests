@@ -5,5 +5,5 @@
 
 🛠 **Технологический стек**
 - **Платформа:** java 21
-- **ORM:** Hibernate + Postgresql 18- 
+- **ORM:** Hibernate + Postgresql 18
 - **Тесты:** jUnit
