@@ -168,7 +168,7 @@ public class AdminCrudServiceImpl implements AdminCrudService {
 
         jpaUserRepo.save(targetUser);
 
-        log.info("User with targetUuid {} was deleted by user with uuid: {}", targetUuid, currentUserUuid);
+        log.info("User with uuid {} was deleted by user with uuid: {}", targetUuid, currentUserUuid);
     }
 
 }

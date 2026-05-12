@@ -35,8 +35,9 @@ public class AuthMeController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<UserAuthRefreshResponseDto> refreshSession(@CookieValue(name = "refreshToken") @NonNull String currentRefreshToken,
-                                                                   @NonNull HttpServletResponse response) {
+    public ResponseEntity<UserAuthRefreshResponseDto> refreshSession(@CookieValue(name = "refreshToken")
+                                                                     @NonNull String currentRefreshToken,
+                                                                     @NonNull HttpServletResponse response) {
 
         final AuthResult result = authenticationServiceImpl.refresh(currentRefreshToken);
         setCookie(response, result.refreshToken());
